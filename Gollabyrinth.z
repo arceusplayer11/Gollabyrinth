@@ -1,0 +1,81 @@
+#include "std.zh"
+#include "Classic.zh"
+
+//Utilities
+import "Gollabyrinth/Scripts/GL_Gen_Scripts.zs"
+import "Gollabyrinth/Scripts/GL_Gen_Functions.zs"
+
+//Global scale stuff
+import "Gollabyrinth/Scripts/GL_Global_Subscreen.zs"
+import "Gollabyrinth/Scripts/GL_Global_ItemButtons.zs"
+import "Gollabyrinth/Scripts/GL_Global_MPRegen.zs"
+
+//Spells
+import "Gollabyrinth/Scripts/GL_Spell_Purge.zs"
+import "Gollabyrinth/Scripts/GL_Spell_Flametongue.zs"
+
+int G[100000];
+
+enum		//Enums are actually fantastic for global arrays.
+{
+G_BUTTON_A,
+G_BUTTON_B,
+G_BLANK,
+G_BUTTON_L,
+G_BUTTON_R,
+G_ACTIVE_POSX,
+G_ACTIVE_POSY,
+G_ANIM,
+G_MPREGEN,
+G_HEROSCALE,
+G_MENUARRAY = 1024,
+G_MENUARRAYEND = 2048,
+G_END};
+
+enum Color	//Just a handy way of tracking commonly used colors
+{
+C_TRANS = 0x00,
+C_WHITE = 0x0E,
+C_BLACK = 0x0F,
+C_HOLY =  0xD1
+};
+
+global script Global 
+{
+	void run()
+	{
+		Hero->MP = Hero->MaxMP;
+		//Game->DisableActiveSubscreen = true;
+		while(true)
+		{
+			++G[G_ANIM];
+			G[G_ANIM]%=5040;
+			EmergencyRegen();
+			ABLR_Handle();
+			Waitframe();
+		}
+	}
+}
+
+hero script Main
+{
+	void run()
+	{
+		G[G_HEROSCALE] = 0.5;
+		int initxoffset = this->HitXOffset;
+		int inityoffset = this->HitYOffset;
+		int initheight = this->HitHeight;
+		int initwidth = this->HitWidth;
+		while(true)
+		{
+			this->Scale = G[G_HEROSCALE];
+			this->DrawXOffset = 16*((G[G_HEROSCALE]-1)*-0.5);
+			this->DrawYOffset = 16*((G[G_HEROSCALE]-1)*-0.5);
+			this->HitXOffset = initxoffset + 16*((G[G_HEROSCALE]-1)*-0.5);
+			this->HitYOffset = inityoffset + 16*((G[G_HEROSCALE]-1)*-0.5);
+			this->HitHeight = initheight - (16*((G[G_HEROSCALE]-1)*-1));
+			this->HitWidth = initwidth - (16*((G[G_HEROSCALE]-1)*-1));
+			Waitframe();
+		}
+	}
+}

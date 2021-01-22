@@ -61,21 +61,6 @@ hero script Main
 {
 	void run()
 	{
-		G[G_HEROSCALE] = 0.5;
-		int initxoffset = this->HitXOffset;
-		int inityoffset = this->HitYOffset;
-		int initheight = this->HitHeight;
-		int initwidth = this->HitWidth;
-		while(true)
-		{
-			this->Scale = G[G_HEROSCALE];
-			this->DrawXOffset = 16*((G[G_HEROSCALE]-1)*-0.5);
-			this->DrawYOffset = 16*((G[G_HEROSCALE]-1)*-0.5);
-			this->HitXOffset = initxoffset + 16*((G[G_HEROSCALE]-1)*-0.5);
-			this->HitYOffset = inityoffset + 16*((G[G_HEROSCALE]-1)*-0.5);
-			this->HitHeight = initheight - (16*((G[G_HEROSCALE]-1)*-1));
-			this->HitWidth = initwidth - (16*((G[G_HEROSCALE]-1)*-1));
-			Waitframe();
-		}
+		
 	}
 }

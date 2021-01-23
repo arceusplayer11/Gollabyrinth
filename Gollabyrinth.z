@@ -14,6 +14,9 @@ import "Gollabyrinth/Scripts/GL_Global_MPRegen.zs"
 import "Gollabyrinth/Scripts/GL_Spell_Purge.zs"
 import "Gollabyrinth/Scripts/GL_Spell_Flametongue.zs"
 
+//FFCs
+import "Gollabyrinth/Scripts/GL_FFCSteal.zs"
+
 int G[100000];
 
 enum		//Enums are actually fantastic for global arrays.

@@ -13,6 +13,8 @@ import "Gollabyrinth/Scripts/GL_Global_MPRegen.zs"
 //Spells
 import "Gollabyrinth/Scripts/GL_Spell_Purge.zs"
 import "Gollabyrinth/Scripts/GL_Spell_Flametongue.zs"
+import "Gollabyrinth/Scripts/GL_Spell_WindDagger.zs"
+import "Gollabyrinth/Scripts/GL_Spell_SpectralBarrier.zs"
 
 //FFCs
 import "Gollabyrinth/Scripts/GL_FFCSteal.zs"
@@ -40,7 +42,10 @@ enum Color	//Just a handy way of tracking commonly used colors
 C_TRANS = 0x00,
 C_WHITE = 0x0E,
 C_BLACK = 0x0F,
-C_HOLY =  0xD1
+C_HOLY =  0xD1,
+C_GREEN1 =  0x7A,
+C_GREEN2 =  0x7B,
+C_GREEN3 =  0x7C
 };
 
 global script Global 

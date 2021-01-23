@@ -17,7 +17,7 @@ itemdata script Flametongue
 			lweapon flametonguehandler = Screen->CreateLWeapon(LW_SCRIPT10);
 			flametonguehandler->Script = Game->GetLWeaponScript("FlameTongueHandler");
 			flametonguehandler->InitD[0] = baseangle;
-			flametonguehandler->InitD[1] = 10;
+			flametonguehandler->InitD[1] = 5;
 			flametonguehandler->InitD[5] = G[G_ANIM]; //Unique ID used for tracking the children flames
 			flametonguehandler->X = Hero->X+VectorX(8,baseangle);
 			flametonguehandler->Y = Hero->Y+VectorY(8,baseangle);
@@ -85,5 +85,6 @@ lweapon script FlameTongueHandler
 			}
 			if (this->isValid()) this->DeadState = WDS_DEAD;
 		}
+		Quit();
 	}
 }

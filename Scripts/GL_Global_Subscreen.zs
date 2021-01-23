@@ -149,6 +149,8 @@ void AssignItems()
 {
 	AssignSlot(1, 0, 0);
 	AssignSlot(2, 1, 0);
+	AssignSlot(3, 2, 0);
+	AssignSlot(4, 0, 1);
 }
 
 void AssignSlot(int item, int x, int y)

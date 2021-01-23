@@ -53,11 +53,8 @@ lweapon script PurgeWeapon
 					Hero->MP -= 4;
 					PurgeWaitframes(timing, itemid);
 				}
-				Trace(1);
-				Trace(itemid);
 				if (timing > 5) timing -=5;
 				unless (IsUsingItem(itemid) && Hero->Action != LA_GOTHURTLAND && Hero->MP > 4) break;
-				Trace(2);
 				Hero->MP -= 4;
 				unless (Rand(3)) CallPlayerBeam();
 				else CallHomingOrRandBeam();

@@ -144,7 +144,7 @@ lweapon script PurgeWeapon
 			if (Hero->DrawYOffset < (-8 + VectorY(4, G[G_ANIM]*4))) ++Hero->DrawYOffset;
 			bitmap B = InitOutline(Hero->Tile);									//Holy fuck the glowy effect
 			MPWaitframe();												//It needs a waitframe between it.
-			DrawOutline(B, Hero->X+Hero->DrawXOffset, Hero->Y + Hero->DrawYOffset, C_HOLY + Rand(10), OP_OPAQUE);	//Never again.
+			DrawOutline(B, Round(Hero->X+Hero->DrawXOffset), Round(Hero->Y + Hero->DrawYOffset), C_HOLY + Rand(10), OP_OPAQUE);	//Never again.
 		}
 	}
 	

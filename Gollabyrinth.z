@@ -15,6 +15,9 @@ import "Gollabyrinth/Scripts/GL_Spell_Purge.zs"
 import "Gollabyrinth/Scripts/GL_Spell_Flametongue.zs"
 import "Gollabyrinth/Scripts/GL_Spell_WindDagger.zs"
 import "Gollabyrinth/Scripts/GL_Spell_SpectralBarrier.zs"
+import "Gollabyrinth/Scripts/GL_Spell_Drones.zs"
+import "Gollabyrinth/Scripts/GL_Spell_Blizzard.zs"
+import "Gollabyrinth/Scripts/GL_Spell_Snare.zs"
 
 //FFCs
 import "Gollabyrinth/Scripts/GL_FFCSteal.zs"

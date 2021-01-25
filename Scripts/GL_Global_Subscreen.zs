@@ -145,12 +145,16 @@ dmapdata script PassiveSubscreen
 	}
 }
 
+//! ASSIGN ITEMS TO THE SUBSCREEN HERE!
 void AssignItems()
 {
 	AssignSlot(1, 0, 0);
 	AssignSlot(2, 1, 0);
 	AssignSlot(3, 2, 0);
 	AssignSlot(4, 0, 1);
+	AssignSlot(5, 1, 1);
+	AssignSlot(6, 2, 1);
+	AssignSlot(7, 3, 0);
 }
 
 void AssignSlot(int item, int x, int y)

@@ -1,8 +1,8 @@
 lweapon script LWeaponLifespan
 {
-	void run(int lifespan, int layer)
+	void run(int lifespan, int layer, int persistent)
 	{
-		if (layer <= 0)
+		unless (layer || persistent)
 		{
 			Waitframes(lifespan);
 			this->DeadState = WDS_DEAD;
@@ -11,7 +11,8 @@ lweapon script LWeaponLifespan
 		{
 			for (int i = 0; i < lifespan; ++i)
 			{
-				Screen->FastTile(layer, this->X, this->Y, this->Tile, this->CSet, (this->DrawStyle == DS_PHANTOM ? OP_TRANS : OP_OPAQUE));
+				if (layer) Screen->FastTile(layer, this->X, this->Y, this->Tile, this->CSet, (this->DrawStyle == DS_PHANTOM ? OP_TRANS : OP_OPAQUE));
+				if (persistent) this->DeadState = -1;
 				Waitframe();
 			}
 			this->DeadState = WDS_DEAD;

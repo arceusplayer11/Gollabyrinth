@@ -2,27 +2,27 @@
 #include "Classic.zh"
 
 //Utilities
-import "Gollabyrinth/Scripts/GL_Gen_Scripts.zs"
-import "Gollabyrinth/Scripts/GL_Gen_Functions.zs"
+#include "Gollabyrinth/Scripts/GL_Gen_Scripts.zs"
+#include "Gollabyrinth/Scripts/GL_Gen_Functions.zs"
 
 //Global scale stuff
-import "Gollabyrinth/Scripts/GL_Global_Subscreen.zs"
-import "Gollabyrinth/Scripts/GL_Global_ItemButtons.zs"
-import "Gollabyrinth/Scripts/GL_Global_MPRegen.zs"
+#include "Gollabyrinth/Scripts/GL_Global_Subscreen.zs"
+#include "Gollabyrinth/Scripts/GL_Global_ItemButtons.zs"
+#include "Gollabyrinth/Scripts/GL_Global_MPRegen.zs"
+#include "Gollabyrinth/Scripts/GL_Global_SkillTree.zs"
 
 //Spells
-import "Gollabyrinth/Scripts/GL_Spell_Purge.zs"
-import "Gollabyrinth/Scripts/GL_Spell_Flametongue.zs"
-import "Gollabyrinth/Scripts/GL_Spell_WindDagger.zs"
-import "Gollabyrinth/Scripts/GL_Spell_SpectralBarrier.zs"
-import "Gollabyrinth/Scripts/GL_Spell_Drones.zs"
-import "Gollabyrinth/Scripts/GL_Spell_Blizzard.zs"
-import "Gollabyrinth/Scripts/GL_Spell_Snare.zs"
-
-//FFCs
-import "Gollabyrinth/Scripts/GL_FFCSteal.zs"
+#include "Gollabyrinth/Scripts/GL_Spell_Purge.zs"
+#include "Gollabyrinth/Scripts/GL_Spell_Flametongue.zs"
 
 int G[100000];
+
+typedef const int CONFIG;
+typedef const float CONFIGF;
+typedef const bool CONFIGB;
+
+//The base magic regen stat.
+CONFIG MAGIC_BASEREGEN = 6;
 
 enum		//Enums are actually fantastic for global arrays.
 {
@@ -34,7 +34,9 @@ G_BUTTON_R,
 G_ACTIVE_POSX,
 G_ACTIVE_POSY,
 G_ANIM,
+G_MPREGENBASE,
 G_MPREGEN,
+G_MPCOOLDOWN,
 G_HEROSCALE,
 G_MENUARRAY = 1024,
 G_MENUARRAYEND = 2048,
@@ -44,25 +46,26 @@ enum Color	//Just a handy way of tracking commonly used colors
 {
 C_TRANS = 0x00,
 C_WHITE = 0x0E,
+C_GREY = 0x7E,
 C_BLACK = 0x0F,
-C_HOLY =  0xD1,
-C_GREEN1 =  0x7A,
-C_GREEN2 =  0x7B,
-C_GREEN3 =  0x7C
+C_HOLY =  0xD1
 };
 
 global script Global 
 {
 	void run()
 	{
+		G[G_MPREGENBASE] = MAGIC_BASEREGEN;
 		Hero->MP = Hero->MaxMP;
 		//Game->DisableActiveSubscreen = true;
 		while(true)
 		{
 			++G[G_ANIM];
 			G[G_ANIM]%=5040;
-			EmergencyRegen();
+			MagicRegen();
 			ABLR_Handle();
+			Waitdraw();
+			MPCooldownTimer();
 			Waitframe();
 		}
 	}
@@ -72,6 +75,10 @@ hero script Main
 {
 	void run()
 	{
-		
+		while(true)
+		{
+			Waitdraw();
+			Waitframe();
+		}
 	}
 }

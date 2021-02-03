@@ -1,0 +1,24 @@
+namespace Character
+{
+	enum
+	{
+		CHARACTER_ID,			//Int - Character ID
+		CHARACTER_SIG1,			//Int - ID of character's first signature
+		CHARACTER_SIG2,			//Int - ID of character's second signature or passive
+		CHARACTER_ATTACK,		//Float - Base damage multiplier. Ignored if left at 0
+		CHARACTER_DEFENSE,		//Float - Base defense multiplier. Ignored if left at 0
+		CHARACTER_SPEED,		//Float - Base speed multiplier. Ignored if left at 0
+		CHARACTER_MAGIC,		//Float - Base magic regen multiplier. Ignored if left at 0.
+		CHARACTER_UPGRADE,		//Int - Upgrade X ID for the character
+		CHARACTER_UPGRADE_MISC, //Untyped - Upgrade X ID's misc var for the character
+		CHARACTER_END = 71
+	};
+	CONFIG CHARACTER_UPGRADEVARS = 2; //Number of vars per upgrade. To get x upgrade of that character, pass "CHARACTER_UPGRADE+x*CHARACTER_UPGRADEVARS" into the array. For that misc value of that upgrade, instead pass "CHARACTER_UPGRADE_MISC+x*CHARACTER_UPGRADEVARS"
+	untyped Helena[CHARACTER_END];
+	Helena[CHARACTER_ID] = 1;
+	Helena[CHARACTER_SIG1] = 1;			//Rapier
+	Helena[CHARACTER_SIG2] = 2;			//Musket
+	Helena[CHARACTER_MAGIC] = 0.75;		//-25% Magic Regen
+	Helena[CHARACTER_UPGRADE+0*CHARACTER_UPGRADEVARS] = SKILL_SPEEDUP;		//Initial upgrade - Speed
+	Helena[CHARACTER_UPGRADE_MISC+0*CHARACTER_UPGRADEVARS] = 1.15;			//Only need a small upgrade at this point. 53300-3380 = 49920
+}

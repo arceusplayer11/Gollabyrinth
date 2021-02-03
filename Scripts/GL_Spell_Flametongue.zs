@@ -18,7 +18,6 @@ itemdata script Flametongue
 			flametonguehandler->Script = Game->GetLWeaponScript("FlameTongueHandler");
 			flametonguehandler->InitD[0] = baseangle;
 			flametonguehandler->InitD[1] = 5;
-			flametonguehandler->InitD[5] = G[G_ANIM]; //Unique ID used for tracking the children flames
 			flametonguehandler->X = Hero->X+VectorX(8,baseangle);
 			flametonguehandler->Y = Hero->Y+VectorY(8,baseangle);
 			Hero->MP -= 16;
@@ -28,14 +27,13 @@ itemdata script Flametongue
 
 lweapon script FlameTongueHandler
 {
-	void run(int angle, int extend, int dist, int angleoffset, int stopangle, int uid)
+	void run(int angle, int extend, int dist, int angleoffset, int stopangle)
 	{
 		if (dist == 0)
 		{
 			this->CollDetection = false;
 			this->DrawXOffset = -1000;
 			this->HitXOffset = -1000;
-			int timer = 0;
 			for (int i = 1; i <= extend; ++i)
 			{
 				Audio->PlaySound(SFX_FLAMETONGUE);
@@ -45,25 +43,20 @@ lweapon script FlameTongueHandler
 				flamesegment->InitD[1] = 45;
 				flamesegment->InitD[2] = i*8;
 				flamesegment->InitD[3] = -(i*22);
-				flamesegment->InitD[5] = uid;
 				flamesegment->X = this->X;
 				flamesegment->Y = this->Y;
 				flamesegment->Damage = 2;
-				for (int q = 0; q < 10; ++q)
+				for (int i = 0; i < 10; ++i)
 				{
-					if (timer < 45)
-					{
-						Hero->Action = LA_NONE;		//Gotta do the NoneAttack dance!
-						Hero->Action = LA_ATTACKING;	//You need to do it this way to keep Link in the attack animation
-						++timer;
-					}
+					Hero->Action = LA_NONE;		//Gotta do the NoneAttack dance!
+					Hero->Action = LA_ATTACKING;	//You need to do it this way to keep Link in the attack animation
 					MPWaitframe();
 				}
 			}
 			for (int i = 1; i <= Screen->NumLWeapons(); ++i)
 			{
 				lweapon flameload = Screen->LoadLWeapon(i);
-				unless (flameload->Script == Game->GetLWeaponScript("FlameTongueHandler") && flameload != this && flameload->InitD[5] == uid) continue;
+				unless (flameload->Script == Game->GetLWeaponScript("FlameTongueHandler") && flameload != this) continue;
 				flameload->InitD[4] = 1;
 			}
 			if (this->isValid()) this->DeadState = WDS_DEAD;
@@ -85,6 +78,5 @@ lweapon script FlameTongueHandler
 			}
 			if (this->isValid()) this->DeadState = WDS_DEAD;
 		}
-		Quit();
 	}
 }

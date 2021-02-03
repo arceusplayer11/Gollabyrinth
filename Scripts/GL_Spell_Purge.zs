@@ -53,8 +53,11 @@ lweapon script PurgeWeapon
 					Hero->MP -= 4;
 					PurgeWaitframes(timing, itemid);
 				}
+				Trace(1);
+				Trace(itemid);
 				if (timing > 5) timing -=5;
 				unless (IsUsingItem(itemid) && Hero->Action != LA_GOTHURTLAND && Hero->MP > 4) break;
+				Trace(2);
 				Hero->MP -= 4;
 				unless (Rand(3)) CallPlayerBeam();
 				else CallHomingOrRandBeam();
@@ -144,7 +147,7 @@ lweapon script PurgeWeapon
 			if (Hero->DrawYOffset < (-8 + VectorY(4, G[G_ANIM]*4))) ++Hero->DrawYOffset;
 			bitmap B = InitOutline(Hero->Tile);									//Holy fuck the glowy effect
 			MPWaitframe();												//It needs a waitframe between it.
-			DrawOutline(B, Round(Hero->X+Hero->DrawXOffset), Round(Hero->Y + Hero->DrawYOffset), C_HOLY + Rand(10), OP_OPAQUE);	//Never again.
+			DrawOutline(B, Hero->X+Hero->DrawXOffset, Hero->Y + Hero->DrawYOffset, C_HOLY + Rand(10), OP_OPAQUE);	//Never again.
 		}
 	}
 	

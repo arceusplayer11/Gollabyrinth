@@ -41,6 +41,8 @@ dmapdata script ActiveSubscreen
 		AssignItems();
 		int subscreenx = SUBSCREEN_CENTERX+8-(SUBSCREEN_WIDTH*8);
 		int subscreeny = SUBSCREEN_CENTERY+8-(SUBSCREEN_HEIGHT*8);
+		
+		//Create a fade-to-black effect as the subscreen opens by stacking translucent black box draws
 		repeat(2)
 		{
 			Screen->Rectangle(7, 0, 0, 255, 176, C_BLACK, 1, 0, 0, 0, true, OP_TRANS);
@@ -54,17 +56,30 @@ dmapdata script ActiveSubscreen
 		}
 		do
 		{
+			//Open Skill Tree
+			if(Input->Press[CB_SKILLTREE])
+			{
+				SkillTree::Operate(1, 0x71);
+			}
+			
+			//Process cursor movement inputs.
 			if (Input->Press[CB_UP]) {--G[G_ACTIVE_POSY]; Audio->PlaySound(SFX_SUBSCREEN_SELECT);}
 			else if (Input->Press[CB_DOWN]) {++G[G_ACTIVE_POSY]; Audio->PlaySound(SFX_SUBSCREEN_SELECT);}
 			if (Input->Press[CB_LEFT]) {--G[G_ACTIVE_POSX]; Audio->PlaySound(SFX_SUBSCREEN_SELECT);}
 			else if (Input->Press[CB_RIGHT]) {++G[G_ACTIVE_POSX]; Audio->PlaySound(SFX_SUBSCREEN_SELECT);}
+			
+			//Bound the cursor to the subscreen box
 			if (G[G_ACTIVE_POSX] < 0) G[G_ACTIVE_POSX]+=SUBSCREEN_WIDTH;
 			if (G[G_ACTIVE_POSY] < 0) G[G_ACTIVE_POSY]+=SUBSCREEN_HEIGHT;
 			G[G_ACTIVE_POSX]%=SUBSCREEN_WIDTH;
 			G[G_ACTIVE_POSY]%=SUBSCREEN_HEIGHT;
+			
+			//Subscreen backdrop
 			Screen->Rectangle(7, 0, 0, 255, 176, C_BLACK, 1, 0, 0, 0, true, OP_OPAQUE);
 			//Screen->DrawScreen(7, 1, 0x70, 0, 0, 0);
 			DrawBox(7, 36400, 0, subscreenx-16, subscreeny-16, SUBSCREEN_WIDTH+2, SUBSCREEN_HEIGHT+2, OP_OPAQUE);
+			
+			//Process item selection. This makes sure that item slots are swapped if you would assign a button to an item that is already selected.
 			if (Input->Press[CB_A]) 
 			{
 				Audio->PlaySound(SFX_SUBSCREEN_ASSIGN);
@@ -101,6 +116,8 @@ dmapdata script ActiveSubscreen
 				else if (G[G_BUTTON_L] == temp) G[G_BUTTON_L] = G[G_BUTTON_R];
 				G[G_BUTTON_R] = temp;
 			}
+			
+			//Draw item icons on the subscreen
 			for(int x = 0; x < SUBSCREEN_WIDTH; ++x)
 			{
 				for(int y = 0; y < SUBSCREEN_HEIGHT; ++y)
@@ -108,10 +125,14 @@ dmapdata script ActiveSubscreen
 					Screen->FastTile(7, subscreenx + (x*16), subscreeny + (y*16), 39001+GetSlot(x, y), 0, OP_OPAQUE);
 				}
 			}
+			
+			//Cursor is drawn.
 			Screen->FastCombo(7, subscreenx + (G[G_ACTIVE_POSX]*16), subscreeny + (G[G_ACTIVE_POSY]*16), 5123, 0, OP_OPAQUE);
 			Waitframe();
 		}
 		until(Input->Press[CB_START]);
+		
+		//Fade the subscreen out
 		repeat(2)
 		{
 			Screen->Rectangle(7, 0, 0, 255, 176, C_BLACK, 1, 0, 0, 0, true, OP_TRANS);

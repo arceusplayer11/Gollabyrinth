@@ -11,12 +11,12 @@ ffc script RingChanger
 		{
 			if(Input->Press[CB_A])
 			{
-				AssignCharacter(Etherchar);
+				ChangeCharacter(CHAR_LUANJA);
 				Audio->PlaySound(SFX_SECRET);
 			}
 			else if(Input->Press[CB_B])
 			{
-				AssignCharacter(Helena);
+				ChangeCharacter(CHAR_HELENA);
 				Audio->PlaySound(SFX_SECRET);
 			}
 			Waitframe();

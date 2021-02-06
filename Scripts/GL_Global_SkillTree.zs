@@ -47,7 +47,7 @@ enum
 	SKILL_SIG1,				//Character signature skill 1.
 	SKILL_SIG2,				//Character signature skill 2.
 	//Stat upgrades
-	SKILL_DAMAGEUP,			//Damage +x%. Writes to the damage stat
+	SKILL_ATTACKUP,			//Damage +x%. Writes to the damage stat
 	SKILL_DEFENSEUP,		//Defense +x% Writes to the defense stat
 	SKILL_SPEEDUP,			//Speed +x% Writes to the speed stat
 	SKILL_MAGICREGEN,		//Magic +x% Writes to the speed stat
@@ -140,6 +140,40 @@ namespace SkillTree
 				}
 			}
 		}
+		//Draw the box below the skill tree. Parameters are as follow:
+		//Description box
+		CONFIG DESCBOX_TILE = 42004;	//First tile used
+		CONFIG DESCBOX_X = 33;			//X position on bitmap
+		CONFIG DESCBOX_Y = 176;			//Y position on bitmap
+		CONFIG DESCBOX_WIDTH = 223;		//Box width
+		CONFIG DESCBOX_HEIGHT = 48; 	//Box height
+		CONFIG DESCBOX_CSET = 6;		//CSet
+		//Stat box
+		CONFIG STATBOX_TILE = 42024;	//Ditto
+		CONFIG STATBOX_X = 0;			
+		CONFIG STATBOX_Y = 176;			
+		CONFIG STATBOX_WIDTH = 32;		
+		CONFIG STATBOX_HEIGHT = 48; 	
+		CONFIG STATBOX_CSET = 6;		
+		//Name box
+		CONFIG NAMEBOX_TILE = 42004;	//Also Ditto
+		CONFIG NAMEBOX_X = 33;			
+		CONFIG NAMEBOX_Y = 161;			
+		CONFIG NAMEBOX_WIDTH = 64;		
+		CONFIG NAMEBOX_HEIGHT = 14; 	
+		CONFIG NAMEBOX_CSET = 6;				
+		//Coin box
+		CONFIG COINBOX_TILE = 42004;	//Also Ditto
+		CONFIG COINBOX_X = 98;			
+		CONFIG COINBOX_Y = 161;			
+		CONFIG COINBOX_WIDTH = 24;		
+		CONFIG COINBOX_HEIGHT = 14; 	
+		CONFIG COINBOX_CSET = 6;	
+		DrawBoxScale(0, bmp, {DESCBOX_TILE, 3, 3, DESCBOX_TILE+1, 1, 3, DESCBOX_TILE+2, 3, 1}, 6, C_BLACK, DESCBOX_X, DESCBOX_Y, DESCBOX_WIDTH, DESCBOX_HEIGHT, {OP_OPAQUE, OP_OPAQUE});
+		DrawBoxScale(0, bmp, {STATBOX_TILE, 3, 3, STATBOX_TILE+1, 1, 3, STATBOX_TILE+2, 3, 1}, 6, C_BLACK, STATBOX_X, STATBOX_Y, STATBOX_WIDTH, STATBOX_HEIGHT, {OP_OPAQUE, OP_OPAQUE});
+		DrawBoxScale(0, bmp, {NAMEBOX_TILE, 3, 3, NAMEBOX_TILE+1, 1, 3, NAMEBOX_TILE+2, 3, 1}, 6, C_BLACK, NAMEBOX_X, NAMEBOX_Y, NAMEBOX_WIDTH, NAMEBOX_HEIGHT, {OP_OPAQUE, OP_OPAQUE});
+		DrawBoxScale(0, bmp, {COINBOX_TILE, 3, 3, COINBOX_TILE+1, 1, 3, COINBOX_TILE+2, 3, 1}, 6, C_BLACK, COINBOX_X, COINBOX_Y, COINBOX_WIDTH, COINBOX_HEIGHT, {OP_OPAQUE, OP_OPAQUE});
+		//bmp->DrawTile(0, DESCBOX_X,  DESCBOX_Y, DESCBOX_TILE, DESCBOX_WIDTH, DESCBOX_HEIGHT, DESCBOX_CSET, -1, -1, 0, 0, 0, 0, true, OP_OPAQUE);
 		//Screen->SetRenderTarget(RT_SCREEN);
 	}
 	//Returns a pointer to somewhere within the node array.

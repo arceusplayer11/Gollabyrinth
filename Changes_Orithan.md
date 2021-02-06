@@ -1,5 +1,13 @@
 # GOLLABYRINTH - CHANGES MADE BY ORITHAN
 
+### Commit #3. ZC Version: 2.55 Alpha 85+. Feburary 7th 2021.
+
+- Added a new box drawing function, `DrawBoxScale()`, to `GL_Gen_Functions`. This is a drawing function which uses scaling to draw text boxes, allowing for ones that grow or shrink and easily allowing for sub-tile increments. Look it up for more details.
+- Moved the skill tree tiles to Page 160 and 161.
+- Properly implemented character switching. Also improved the stat calculation formula. Currently needs testing on the coins
+- Fixed the magic regen formula to account for it through the whole formula as opposed to affecting a single part of it.
+- Moved the four base stats to `Hero->Misc[]`, prefixed with `HMISC_` instead of `G_`, and added a parameter for current character ID `HMISC_CHARID`.
+- Forgot to mention this last commit: All `import` statements are replaced with `#include` statements. They do the same thing except make it easier for people working on the file to work on it if they put their scripts outside the ZC folder.
 
 ### Commit #2. ZC Version: 2.55 Alpha 85+. Feburary 5th 2021.
 

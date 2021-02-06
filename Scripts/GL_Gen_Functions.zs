@@ -49,6 +49,62 @@ void DrawBox(int layer, int tile, int cset, int x, int y, int width, int height,
 	}
 }
 
+/*
+Draws a box/frame using tile scaling to either the screen or a bitmap of your choice. This requires three tiles. Lighter on resources and tile space but lacks the ability to make any complicated systems.
+layer - Layer to draw on
+target - Target bitmap.
+tiles - The metadata of the three tiles the frame uses. Pass an array of at least size 9 to use. The indicies should be formatted like this:
+	{cornertile, cornerw, cornerh, horiztile, horizw, horizh, verttile, vertw, verth}
+cset - CSet for the frame to be drawn in.
+boxcolor - The colour of the interior of the box. Leave it if you don't need it drawn
+x - X position to draw the box at
+y - Y position to draw the box at
+width - width of the box
+height - height of the box
+opacity - opacity of the whole box. Supply an array of at least Size 2 to use. The indicies should be formatted like this:
+	{frameopacity, boxopacity}
+*/
+void DrawBoxScale(int layer, bitmap target, int tiles, int cset, int boxcolor, int x, int y, int width, int height, int opacity) 
+{
+	width = Max(width, tiles[1]*2);
+	height = Max(height, tiles[2]*2);
+	//Draw the interior of the box first if the selected colour is valid and not translucent
+	if(boxcolor > 0x00 && boxcolor <= 0xFF)
+		target->Rectangle(layer, x+tiles[1], y+tiles[2], x+width-tiles[1], y+height-tiles[2], boxcolor, -1, 0, 0, 0, true, opacity[1]);
+	//Draw the horizontal pieces
+	target->DrawTile(layer, x+tiles[1], y, tiles[3], 1, 1, cset, (width-tiles[1]*2)/(tiles[4]), 16, 0, 0, 0, FLIP_NONE, true, opacity[0]); //Top
+	target->DrawTile(layer, x+tiles[1], y+height-(16-tiles[5])-tiles[5], tiles[3], 1, 1, cset, (width-tiles[1]*2)/tiles[4], 16, 0, 0, 0, FLIP_VERTICAL, true, opacity[0]); //Bottom
+	//Draw the vertical pieces
+	target->DrawTile(layer, x, y+tiles[2], tiles[6], 1, 1, cset, 16, (height-tiles[2]*2)/tiles[8], 0, 0, 0, FLIP_NONE, true, opacity[0]); //Left
+	target->DrawTile(layer, x+width-(16-tiles[7])-tiles[7], y+tiles[2], tiles[6], 1, 1, cset, 16, (height-tiles[2]*2)/tiles[8], 0, 0, 0, FLIP_HORIZONTAL, true, opacity[0]); //Right
+	//Draw the corner pieces
+	target->DrawTile(layer, x, y, tiles[0], 1, 1, cset, -1, -1, 0, 0, 0, FLIP_NONE, true, opacity[0]); //Top left
+	target->DrawTile(layer, x+width-(16-tiles[1])-tiles[1], y, tiles[0], 1, 1, cset, -1, -1, 0, 0, 0, FLIP_HORIZONTAL, true, opacity[0]); //Top right
+	target->DrawTile(layer, x, y+height-(16-tiles[2])-tiles[2], tiles[0], 1, 1, cset, -1, -1, 0, 0, 0, FLIP_VERTICAL, true, opacity[0]); //Bottom left
+	target->DrawTile(layer, x+width-(16-tiles[1])-tiles[1], y+height-(16-tiles[2])-tiles[2], tiles[0], 1, 1, cset, -1, -1, 0, 0, 0, FLIP_BOTH, true, opacity[0]); //Bottom right
+}
+
+//Draws to the screen instead of a bitmap
+void DrawBoxScale(int layer, int tiles, int cset, int boxcolor, int x, int y, int width, int height, int opacity) 
+{
+	width = Max(width, tiles[1]*2);
+	height = Max(height, tiles[2]*2);
+	//Draw the interior of the box first if the selected colour is valid and not translucent
+	if(boxcolor > 0x00 && boxcolor <= 0xFF)
+		Screen->Rectangle(layer, x+tiles[1], y+tiles[2], x+width-tiles[1], y+height-tiles[2], boxcolor, -1, 0, 0, 0, true, opacity[1]);
+	//Draw the horizontal pieces
+	Screen->DrawTile(layer, x+tiles[1], y, tiles[3], 1, 1, cset, (width-tiles[1]*2)/(tiles[4]), 16, 0, 0, 0, FLIP_NONE, true, opacity[0]); //Top
+	Screen->DrawTile(layer, x+tiles[1], y+height-(16-tiles[5])-tiles[5], tiles[3], 1, 1, cset, (width-tiles[1]*2)/tiles[4], 16, 0, 0, 0, FLIP_VERTICAL, true, opacity[0]); //Bottom
+	//Draw the vertical pieces
+	Screen->DrawTile(layer, x, y+tiles[2], tiles[6], 1, 1, cset, 16, (height-tiles[2]*2)/tiles[8], 0, 0, 0, FLIP_NONE, true, opacity[0]); //Left
+	Screen->DrawTile(layer, x+width-(16-tiles[7])-tiles[7], y+tiles[2], tiles[6], 1, 1, cset, 16, (height-tiles[2]*2)/tiles[8], 0, 0, 0, FLIP_HORIZONTAL, true, opacity[0]); //Right
+	//Draw the corner pieces
+	Screen->DrawTile(layer, x, y, tiles[0], 1, 1, cset, -1, -1, 0, 0, 0, FLIP_NONE, true, opacity[0]); //Top left
+	Screen->DrawTile(layer, x+width-(16-tiles[1])-tiles[1], y, tiles[0], 1, 1, cset, -1, -1, 0, 0, 0, FLIP_HORIZONTAL, true, opacity[0]); //Top right
+	Screen->DrawTile(layer, x, y+height-(16-tiles[2])-tiles[2], tiles[0], 1, 1, cset, -1, -1, 0, 0, 0, FLIP_VERTICAL, true, opacity[0]); //Bottom left
+	Screen->DrawTile(layer, x+width-(16-tiles[1])-tiles[1], y+height-(16-tiles[2])-tiles[2], tiles[0], 1, 1, cset, -1, -1, 0, 0, 0, FLIP_BOTH, true, opacity[0]); //Bottom right
+}
+
 npc GetEnemy()	//Gets a valid, beatable enemy
 {
 	unless(EnemiesAlive()) return NULL;

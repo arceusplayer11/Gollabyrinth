@@ -36,7 +36,7 @@ typedef const bool CONFIGB;		//Boolean configs
 CONFIGF BASESTAT_ATTACK = 1.0;	//Your base Attack stat. This refers to the amount of damage you do with your basic primary
 CONFIGF BASESTAT_DEFENSE = 1.0;	//Your base Defense stat. This does not correlate 1:1 to what is shown in the editor, as higher numbers indicate more defense and lower values less defense as opposed to what it would be on the 
 CONFIGF BASESTAT_SPEED = 1.5;	//The base step speed.
-CONFIGF BASESTAT_MAGIC = 6.0; 	//The base magic regen stat.
+CONFIGF BASESTAT_MAGIC = 1.0; 	//The base magic regen stat.
 
 enum		//Enums are actually fantastic for global arrays.
 {
@@ -48,10 +48,6 @@ G_BUTTON_R,				//Int: Item assigned to the R button
 G_ACTIVE_POSX,			//Int: The X position of the cursor on the subscreen. Note that these two refer to Slots instead of raw X/Y axis
 G_ACTIVE_POSY,			//Int: The Y position of the cursor
 G_ANIM,					//Int: Current anim counter
-G_ATTACK,				//Float: Base Attack stat.
-G_DEFENSE,				//Float: Base Defense stat.
-G_SPEED,				//Float: Base Speed stat.
-G_MAGIC,				//Float: Base Magic stat. This is your magic regen stat.
 G_MPREGEN,				//Float: Current Magic regen level.
 G_MPCOOLDOWN,			//Int: Magic regen cooldown
 G_HEROSCALE,			//Int: The scale the player is at
@@ -72,11 +68,20 @@ C_GREEN2 =  0x7B,
 C_GREEN3 =  0x7C
 };
 
+//New counter definitions
 CONFIG CR_COINS = CR_CUSTOM1;	//Coin counter
 
+//New item definitions
 CONFIG I_RINGPALETTE = 158;		//The Ring Palette item. This ring item is modified to change your Defense, your base player tiles and your palette.
 CONFIG I_RINGPALETTE0 = 159;	//A second Ring Palette item, lower level than the previous one. This item silently gets added or removed from their inventory whenever the player's palette would change. This exists solely to get around the ZC bug where the player's palette does not update when you modify the sprite palette of the currently active ring. This item and any code that runs with it will be removed after this bug is fixed.
 CONFIG I_COIN = 160;			//The basic Coin item.
+
+//Hero->Misc[] definitions
+CONFIG HMISC_CHARID = 0;
+CONFIG HMISC_ATTACK = 1;
+CONFIG HMISC_DEFENSE = 2;
+CONFIG HMISC_SPEED = 3;
+CONFIG HMISC_MAGIC = 4;
 
 //Initiates global variables. Runs only when you load up the game for the first time.
 global script Init
@@ -84,10 +89,11 @@ global script Init
 	void run()
 	{
 		//Set base stats
-		G[G_ATTACK] = BASESTAT_ATTACK;
-		G[G_DEFENSE] = BASESTAT_DEFENSE;
-		G[G_SPEED] = BASESTAT_SPEED;
-		G[G_MAGIC] = BASESTAT_MAGIC;
+		Hero->Misc[HMISC_ATTACK] = BASESTAT_ATTACK;
+		Hero->Misc[HMISC_DEFENSE] = BASESTAT_DEFENSE;
+		Hero->Misc[HMISC_SPEED] = BASESTAT_SPEED;
+		Hero->Misc[HMISC_MAGIC] = BASESTAT_MAGIC;
+		Character::AssignCharPointers();
 	}
 }
 
@@ -96,11 +102,10 @@ global script Global
 	void run()
 	{
 		//Initialize Character arrays.
-		Character::EthercharInit();
+		Character::LuanjaInit();
 		Character::HelenaInit();
-		//Assign default character to begin with (for now, this will be removed later)
-		Character::AssignCharacter(Character::Etherchar);
 		Hero->MP = Hero->MaxMP;
+		Character::ChangeCharacter(Character::CHAR_LUANJA);
 		//Game->DisableActiveSubscreen = true;
 		while(true)
 		{

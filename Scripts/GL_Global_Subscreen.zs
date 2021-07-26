@@ -176,6 +176,7 @@ void AssignItems()
 	AssignSlot(5, 1, 1);
 	AssignSlot(6, 2, 1);
 	AssignSlot(7, 3, 0);
+	AssignSlot(8, 3, 1);
 }
 
 void AssignSlot(int item, int x, int y)

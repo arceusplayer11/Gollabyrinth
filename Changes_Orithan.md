@@ -1,5 +1,13 @@
 # GOLLABYRINTH - CHANGES MADE BY ORITHAN
 
+### Commit #4. ZC Version: 2.55 Alpha 85+. July ? 2021.
+
+- Added `DrawLayerFix.zh` and put it into a dedicated header folder. This version is wrapped in the `DrawLayerFix` namespace in the unlikely event we end up getting other functions with the same identifier.
+- The Plasma Spell, Nova, has been implemented. The SFX and explosion sprites are currently placeholder. I need to secure a source of either Metroid Prime 1's Plasma Beam charge and charge shot SFX or Metroid Prime 3's Nova Beam charge and charge shot SFX or something that feels similar to those. I also need a more "solar" explosion animation.
+- Force disabled the `2.50 Divison Trunication` and `2.50 Boolean value of 0.0001` Compiler settings. The former being set to On was causing serious bugs with my code due to the way 2.50 division trunication worked.
+- Added documentation for some of Dimi's scripts. I would very much appreciate if you comment your stuff so I don't have to come in, interpert what it is and then write the comments myself, Dimi.
+- Reverted the change the `G_[Stat]` variables had. Now they read from the `G[]` Array again.
+
 ### Commit #3. ZC Version: 2.55 Alpha 85+. Feburary 7th 2021.
 
 - Added a new box drawing function, `DrawBoxScale()`, to `GL_Gen_Functions`. This is a drawing function which uses scaling to draw text boxes, allowing for ones that grow or shrink and easily allowing for sub-tile increments. Look it up for more details.

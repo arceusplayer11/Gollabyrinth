@@ -8,7 +8,7 @@ Reworked by Orithan
 //Runs the regeneration system in the game. The lower MP you have, the faster you recharge.
 void MagicRegen()
 {
-	G[G_MPREGEN] += (6 + 128/Hero->MaxMP*(Hero->MaxMP - Hero->MP)/(100/Hero->MaxMP*Hero->MP <= 25 ? 8 : 12))*Hero->Misc[HMISC_MAGIC]; //Calculates magic that should be regend this frame. This formula could do with some further tweaking
+	G[G_MPREGEN] += (6 + 128/Hero->MaxMP*(Hero->MaxMP - Hero->MP)/(100/Hero->MaxMP*Hero->MP <= 25 ? 8 : 12))*G[G_MAGIC]; //Calculates magic that should be regend this frame. This formula could do with some further tweaking
 	while (G[G_MPREGEN] > 768)
 	{
 		G[G_MPREGEN]-=256;

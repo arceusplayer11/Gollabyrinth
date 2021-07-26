@@ -74,11 +74,11 @@ namespace Character
 		CharacterPointers[CHAR_LUANJA] = Luanja;
 		CharacterPointers[CHAR_HELENA] = Helena;
 	}
-	//Changes the character. Do note that modifying HMISC_CHARID by itself does nothing - the game needs to update the player's stats, skills, etc. first
+	//Changes the character. Do note that modifying G_CHARID by itself does nothing - the game needs to update the player's stats, skills, etc. first
 	void ChangeCharacter(int charid)
 	{
 		using namespace Character;
-		Hero->Misc[HMISC_CHARID] = charid;
+		G[G_CHARID] = charid;
 		AssignCharacter(CharacterPointers[charid]);
 	}
 	//Supply an array that is the size of CHARACTER_END to use this function. I_RINGPALETTE also needs to be a Ring item.
@@ -100,10 +100,10 @@ namespace Character
 	void AssignData(untyped chararray)
 	{
 		//Assign base stats, defaulting if they do not have that base stat set.
-		Hero->Misc[HMISC_ATTACK] = chararray[CHARACTER_ATTACK] > 0 ? BASESTAT_ATTACK*chararray[CHARACTER_ATTACK] : BASESTAT_ATTACK;
-		Hero->Misc[HMISC_DEFENSE] = chararray[CHARACTER_DEFENSE] > 0 ? BASESTAT_DEFENSE*chararray[CHARACTER_DEFENSE] : BASESTAT_DEFENSE;
-		Hero->Misc[HMISC_SPEED] = chararray[CHARACTER_SPEED] > 0 ? BASESTAT_SPEED*chararray[CHARACTER_SPEED] : BASESTAT_SPEED;
-		Hero->Misc[HMISC_MAGIC] = chararray[CHARACTER_MAGIC] > 0 ? BASESTAT_MAGIC*chararray[CHARACTER_MAGIC] : BASESTAT_MAGIC;
+		G[G_ATTACK] = chararray[CHARACTER_ATTACK] > 0 ? BASESTAT_ATTACK*chararray[CHARACTER_ATTACK] : BASESTAT_ATTACK;
+		G[G_DEFENSE] = chararray[CHARACTER_DEFENSE] > 0 ? BASESTAT_DEFENSE*chararray[CHARACTER_DEFENSE] : BASESTAT_DEFENSE;
+		G[G_SPEED] = chararray[CHARACTER_SPEED] > 0 ? BASESTAT_SPEED*chararray[CHARACTER_SPEED] : BASESTAT_SPEED;
+		G[G_MAGIC] = chararray[CHARACTER_MAGIC] > 0 ? BASESTAT_MAGIC*chararray[CHARACTER_MAGIC] : BASESTAT_MAGIC;
 		//Scan the coin upgrades
 		int coins = Game->MCounter[CR_COINS];
 		for(int ind = CHARACTER_UPGRADE; ind < CHARACTER_END; ind += UPGRADE_END)
@@ -114,10 +114,10 @@ namespace Character
 				switch(chararray[ind+UPGRADE_ID])
 				{
 					//Same line braces used because these are simple statements and thus could benefit greatly from being compacted as opposed to being strewn across several lines each like it would be otherwise
-					case SKILL_ATTACKUP: { Hero->Misc[HMISC_ATTACK] += chararray[ind+UPGRADE_MISC]; break; } //Attack upgrade.
-					case SKILL_DEFENSEUP: { Hero->Misc[HMISC_DEFENSE] += chararray[ind+UPGRADE_MISC]; break; } //Defense upgrade.
-					case SKILL_SPEEDUP: { Hero->Misc[HMISC_SPEED] += chararray[ind+UPGRADE_MISC]; break; } //Speed upgrade.
-					case SKILL_MAGICREGEN: { Hero->Misc[HMISC_MAGIC] += chararray[ind+UPGRADE_MISC]; break; } //Magic upgrade.
+					case SKILL_ATTACKUP: { G[G_ATTACK] += chararray[ind+UPGRADE_MISC]; break; } //Attack upgrade.
+					case SKILL_DEFENSEUP: { G[G_DEFENSE] += chararray[ind+UPGRADE_MISC]; break; } //Defense upgrade.
+					case SKILL_SPEEDUP: { G[G_SPEED] += chararray[ind+UPGRADE_MISC]; break; } //Speed upgrade.
+					case SKILL_MAGICREGEN: { G[G_MAGIC] += chararray[ind+UPGRADE_MISC]; break; } //Magic upgrade.
 				}
 			}
 		}

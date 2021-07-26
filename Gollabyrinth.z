@@ -1,5 +1,12 @@
+//Force compiler options
+#option TRUNCATE_DIVISION_BY_LITERAL_BUG off
+#option BOOL_TRUE_RETURN_DECIMAL off
+
 #include "std.zh"
 #include "Classic.zh"
+
+//Customized Headers
+#include "Gollabyrinth/Headers/DrawLayerFix.zh"
 
 //Utilities
 #include "Gollabyrinth/Scripts/GL_Gen_Scripts.zs"
@@ -21,6 +28,7 @@
 #include "Gollabyrinth/Scripts/GL_Spell_Drones.zs"
 #include "Gollabyrinth/Scripts/GL_Spell_Blizzard.zs"
 #include "Gollabyrinth/Scripts/GL_Spell_Snare.zs"
+#include "Gollabyrinth/Scripts/GL_Spell_Nova.zs"
 
 //FFCs
 #include "Gollabyrinth/Scripts/GL_FFCSteal.zs"
@@ -28,6 +36,7 @@
 untyped G[100000]; //Untyped so any pointer can be passed into the array.
 
 //Config typedefs
+typedef const int DEFINE;		//Do not change DEFINE constants unless you know what you're doing.
 typedef const int CONFIG; 		//Integer configs
 typedef const float CONFIGF;	//Float configs
 typedef const bool CONFIGB;		//Boolean configs
@@ -51,6 +60,11 @@ G_ANIM,					//Int: Current anim counter
 G_MPREGEN,				//Float: Current Magic regen level.
 G_MPCOOLDOWN,			//Int: Magic regen cooldown
 G_HEROSCALE,			//Int: The scale the player is at
+G_CHARID,
+G_ATTACK,
+G_DEFENSE,
+G_SPEED,
+G_MAGIC,
 G_MENUARRAY = 1024,		//Int: Beginning of the menu array vars
 G_MENUARRAYEND = 2048,	//Int: End of the menu array vars
 G_END};
@@ -76,12 +90,20 @@ CONFIG I_RINGPALETTE = 158;		//The Ring Palette item. This ring item is modified
 CONFIG I_RINGPALETTE0 = 159;	//A second Ring Palette item, lower level than the previous one. This item silently gets added or removed from their inventory whenever the player's palette would change. This exists solely to get around the ZC bug where the player's palette does not update when you modify the sprite palette of the currently active ring. This item and any code that runs with it will be removed after this bug is fixed.
 CONFIG I_COIN = 160;			//The basic Coin item.
 
+CONFIG SFX_RUMBLE = 76; //Rumble SFX used for Quake, Thunder, Meteor, etc. in Yuurand.
+
+//LWeapon Scripts. These are hardcoded script IDs because of the way the subscreen is set up. This is subject to change in due time.
+DEFINE ITMS_PURGE = 1; //Purge
+DEFINE ITMS_FLAMETONGUE = 2; //Fire whip
+DEFINE ITMS_WINDDAGGER = 3; //Wind daggers
+DEFINE ITMS_SPECTRALBARRIER = 4; //Spectral Barrier
+DEFINE ITMS_SENTRIES = 5; //Sentries
+DEFINE ITMS_BLIZZARD = 6; //Blizzard
+DEFINE ITMS_SNARE = 7; //Snare
+DEFINE ITMS_NOVA = 8; //Nova
+
+
 //Hero->Misc[] definitions
-CONFIG HMISC_CHARID = 0;
-CONFIG HMISC_ATTACK = 1;
-CONFIG HMISC_DEFENSE = 2;
-CONFIG HMISC_SPEED = 3;
-CONFIG HMISC_MAGIC = 4;
 
 //Initiates global variables. Runs only when you load up the game for the first time.
 global script Init
@@ -89,10 +111,10 @@ global script Init
 	void run()
 	{
 		//Set base stats
-		Hero->Misc[HMISC_ATTACK] = BASESTAT_ATTACK;
-		Hero->Misc[HMISC_DEFENSE] = BASESTAT_DEFENSE;
-		Hero->Misc[HMISC_SPEED] = BASESTAT_SPEED;
-		Hero->Misc[HMISC_MAGIC] = BASESTAT_MAGIC;
+		G[G_ATTACK] = BASESTAT_ATTACK;
+		G[G_DEFENSE] = BASESTAT_DEFENSE;
+		G[G_SPEED] = BASESTAT_SPEED;
+		G[G_MAGIC] = BASESTAT_MAGIC;
 		Character::AssignCharPointers();
 	}
 }

@@ -122,6 +122,12 @@ bool isTargetable(npc enemy) //Checks if an enemy is beatable
 	return (((enemy->MiscFlags&NPCMF_NOT_BEATABLE) || enemy->Type == NPCT_FAIRY || enemy->Type == NPCT_GUY) ? false : true);
 }
 
+//Checks if the coordinates are onscreen
+bool isOnScreen(int x, int y)
+{
+	return (x >= SCREEN_LEFT && x <= SCREEN_RIGHT && y >= SCREEN_TOP && y <= SCREEN_BOTTOM);
+}
+
 void SafeArc(int layer, int x, int y, int radius, int startangle, int endangle, int color, float scale, int rx, int ry, int rangle, bool closed, bool fill, int opacity)
 {
 	if (startangle > endangle)

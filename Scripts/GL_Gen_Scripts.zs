@@ -1,8 +1,10 @@
+//Written by Dimi
+//Simply gives the weapon a lifespan, potentially drawing its tile to a different layer or keeping it persistent ~ Orithan
 lweapon script LWeaponLifespan
 {
 	void run(int lifespan, int layer, int persistent)
 	{
-		unless (layer || persistent)
+		unless (layer || persistent) //Neither layer or persistent is set, weapon does nothing until its lifespan times out. ~ Orithan
 		{
 			Waitframes(lifespan);
 			this->DeadState = WDS_DEAD;
@@ -12,7 +14,7 @@ lweapon script LWeaponLifespan
 			for (int i = 0; i < lifespan; ++i)
 			{
 				if (layer) Screen->FastTile(layer, this->X, this->Y, this->Tile, this->CSet, (this->DrawStyle == DS_PHANTOM ? OP_TRANS : OP_OPAQUE));
-				if (persistent) this->DeadState = -1;
+				if (persistent) this->DeadState = -1; //Keep weapon alive after hitting enemy. ~ Orithan
 				Waitframe();
 			}
 			this->DeadState = WDS_DEAD;
@@ -20,6 +22,8 @@ lweapon script LWeaponLifespan
 	}
 }
 
+//Dimi's SkillTree script.
+//I'll eventually merge my SkillTree script with Dimi's ~ Orithan
 ffc script DrawSkillTree
 {
 	void run(int ffcid)

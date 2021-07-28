@@ -1,3 +1,4 @@
+//This is written by Orithan.
 namespace Character
 {
 	//Pointers for each upgrade var
@@ -19,6 +20,7 @@ namespace Character
 		CHARACTER_DEFENSE,			//Float - Initial defense multiplier. Ignored if left at 0
 		CHARACTER_SPEED,			//Float - Initial speed multiplier. Ignored if left at 0
 		CHARACTER_MAGIC,			//Float - Initial magic regen multiplier. Ignored if left at 0.
+		CHARACTER_UPGRADESCREEN,	//Int - Screen to read from for skill tree upgrades.
 		//The upgrade vars should come after anything else in the enum list.
 		CHARACTER_UPGRADE,			//Int - Upgrade X for the character
 		CHARACTER_END = CHARACTER_UPGRADE+32*UPGRADE_END //Cap off the character arrays at a number large enough to contain the baseline statistics for each character plus all of the baggage their 32 upgrade slots come with
@@ -55,6 +57,7 @@ namespace Character
 		using namespace Character;
 		Luanja[CHARACTER_TILEOFF] = 0;
 		Luanja[CHARACTER_PALETTE] = 8;
+		Luanja[CHARACTER_UPGRADESCREEN] = 0x71;
 	}
 	void HelenaInit() 					//Initializes/refreshes Helena's character vars.
 	{
@@ -64,6 +67,7 @@ namespace Character
 		Helena[CHARACTER_SIG1] = S_RAPIER;					//Rapier
 		Helena[CHARACTER_SIG2] = S_MUSKET;					//Musket
 		Helena[CHARACTER_MAGIC] = 0.75;						//-25% Magic Regen
+		Helena[CHARACTER_UPGRADESCREEN] = 0x72;
 		Helena[UpgVar(0, UPGRADE_ID)] = SKILL_SPEEDUP;		//Initial upgrade - Speed
 		Helena[UpgVar(0, UPGRADE_MISC)] = 0.15;				//Only need a small upgrade at this point.
 		Helena[UpgVar(0, UPGRADE_PRICE)] = 10;				//Also only needs a small amount of coins.
@@ -74,7 +78,18 @@ namespace Character
 		CharacterPointers[CHAR_LUANJA] = Luanja;
 		CharacterPointers[CHAR_HELENA] = Helena;
 	}
-	//Changes the character. Do note that modifying G_CHARID by itself does nothing - the game needs to update the player's stats, skills, etc. first
+	//!!USE WITH CAUTION!!
+	//Returns the data array pointer for a given character. If it is not an array (eg. not set up) it returns -1 instead.
+	//MAKE SURE THE POINTER IS SANITIZED BEFOREHAND AND TO ENSURE THE RETURNED ARRAY POINTER IS VALID AFTERWARDS.
+	int ReturnCharacterArray(int character)
+	{
+		//Character array pointer set up and valid.
+		if(IsValidArray(CharacterPointers[character]) && SizeOfArray(CharacterPointers[character]) == CHARACTER_END)
+			return CharacterPointers[character];
+		//Invalid or not set up character
+		return -1;
+	}
+	//Changes the character. 
 	void ChangeCharacter(int charid)
 	{
 		using namespace Character;
@@ -129,5 +144,10 @@ namespace Character
 	{
 		palring->Attributes[0] = pal;
 		Hero->Item[I_RINGPALETTE0] = Hero->Item[I_RINGPALETTE0] ? false : true; //Ternary saves the day again
+	}
+	//Returns the amount of damage an attack would do to an enemy before their modifiers come into play.
+	float GetAttackDamage(float damage, int element)
+	{
+		return damage/1*G[G_ATTACK];
 	}
 }

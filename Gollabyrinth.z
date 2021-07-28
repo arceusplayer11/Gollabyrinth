@@ -60,11 +60,11 @@ G_ANIM,					//Int: Current anim counter
 G_MPREGEN,				//Float: Current Magic regen level.
 G_MPCOOLDOWN,			//Int: Magic regen cooldown
 G_HEROSCALE,			//Int: The scale the player is at
-G_CHARID,
-G_ATTACK,
-G_DEFENSE,
-G_SPEED,
-G_MAGIC,
+G_CHARID,				//Int: Current character ID. Do note that modifying G_CHARID by itself is inadvised - You should also run AssignCharacter() whenever you change this.
+G_ATTACK,				//Float: Current Attack stat. 1 = Standard Damage
+G_DEFENSE,				//Float: Current Defense stat. 1 = Standard Defense
+G_SPEED,				//Float: Current Speed stat. This modifies Hero->Step directly. 1 = 100 Step Speed. 
+G_MAGIC,				//Float: Current Magic stat. This modifies how quickly magic regens.
 G_MENUARRAY = 1024,		//Int: Beginning of the menu array vars
 G_MENUARRAYEND = 2048,	//Int: End of the menu array vars
 G_END};
@@ -80,6 +80,51 @@ C_HOLY =  0xD1,
 C_GREEN1 =  0x7A,
 C_GREEN2 =  0x7B,
 C_GREEN3 =  0x7C
+};
+
+//List of elements.
+//Included in the enums is a bunch of cap enums for each damage type so we can have handy functions that check to see what damage type the element is part of. This is a measure to avoid hardcoding these definitions into whatever we use to check elements against their damage types and these are set up so they don't inflate the actual cap for the enums - they still cap out at the number of elements present.
+enum Element
+{
+	ELEMENT_NON_START, //Start of Non-Elemental damage type
+	ELEMENT_NEUTRAL = ELEMENT_NON_START,
+	ELEMENT_ARCANE,
+	ELEMENT_NON_END = ELEMENT_ARCANE, //End of Non-Elemental damage type
+	
+	ELEMENT_NATURAL_START, //Start of Natural damage type
+	ELEMENT_NATURE = ELEMENT_NATURAL_START,
+	ELEMENT_EARTH,
+	ELEMENT_WIND,
+	ELEMENT_NATURAL_END = ELEMENT_WIND, //End of Natural damage type
+	
+	ELEMENT_COLD_START, //Start of Cold damage type
+	ELEMENT_WATER = ELEMENT_COLD_START,
+	ELEMENT_ICE,
+	ELEMENT_COLD_END = ELEMENT_ICE, //End of Cold damage type
+	
+	ELEMENT_BURN_START, //Start of Burn damage type
+	ELEMENT_FIRE = ELEMENT_BURN_START,
+	ELEMENT_PLASMA,
+	ELEMENT_BURN_END = ELEMENT_PLASMA, //End of Burn damage type
+	
+	ELEMENT_TECH_START, //Start of Technology damage type
+	ELEMENT_TECHNOLOGY = ELEMENT_TECH_START,
+	ELEMENT_METAL,
+	ELEMENT_PHYSICAL,
+	ELEMENT_TECH_END = ELEMENT_PHYSICAL, //End of Technology damage type
+	
+	ELEMENT_HOLY_START, //Start of Holy damage type.
+	ELEMENT_LIGHT = ELEMENT_HOLY_START,
+	ELEMENT_ASTRAL,
+	ELEMENT_HOLY_END = ELEMENT_ASTRAL, //End of Holy damage type
+	
+	ELEMENT_DARK_START, //Start of Dark damage type.
+	ELEMENT_SHADOW = ELEMENT_DARK_START,
+	ELEMENT_VOID,
+	ELEMENT_AETHER,
+	ELEMENT_DARK_END = ELEMENT_AETHER,	//End of Dark damage type.
+	
+	ELEMENT_END //Cap enum
 };
 
 //New counter definitions

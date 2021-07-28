@@ -28,11 +28,12 @@ ffc script DrawSkillTree
 {
 	void run(int ffcid)
 	{
+		//FFC this node links to. ~ Orithan
 		ffc linkto = Screen->LoadFFC(ffcid);
 		
-		int rectwidth = 2;
+		int rectwidth = 2; //Thickness of the lines ~ Orithan
 		
-		
+		//Set up the the linking variables ~ Orithan
 		int xdif = linkto->X - this->X;
 		int ydif = linkto->Y - this->Y;
 		int startx = this->X + 8 - (rectwidth/2);
@@ -50,6 +51,7 @@ ffc script DrawSkillTree
 			starty = this->Y + 8 - ((1+rectwidth)/2);
 			endx = linkto->X + 8 - ((1+rectwidth)/2);
 			endy = linkto->Y + 8 - ((1+rectwidth)/2);
+			//Draw the first rectangle leading from the FFC
 			Screen->Rectangle(1, startx, starty, startx+rectwidth, starty+(ydif/2)+(ydif<0?rectwidth:0), C_WHITE, 1, 0, 0, 0, true, OP_OPAQUE);
 			SafeArc2(1, (xdif<0?startx:startx+rectwidth), starty+(ydif/2)+(ydif<0?rectwidth:0), rectwidth, (ydif<0?270:90), (xdif<0?180:0), C_WHITE, 1, 0, 0, 0, true, true, OP_OPAQUE);
 			if (xdif<0)

@@ -48,15 +48,33 @@ enum
 	SKILL_SIG2,				//Character signature skill 2.
 	//Stat upgrades
 	SKILL_ATTACKUP,			//Damage +x%. Writes to the damage stat
-	SKILL_DEFENSEUP,		//Defense +x% Writes to the defense stat
-	SKILL_SPEEDUP,			//Speed +x% Writes to the speed stat
-	SKILL_MAGICREGEN,		//Magic +x% Writes to the speed stat
+	SKILL_DEFENSEUP,		//Defense +x%. Writes to the defense stat
+	SKILL_SPEEDUP,			//Speed +x%. Writes to the speed stat
+	SKILL_MAGICREGEN,		//Magic +x%. Writes to the magic stat
+	//Spectral skills
+	SKILL_STRONGSPECTRAL,	//+% Damage for Spectral Barrier
+	SKILL_CHEAPSPECTRAL,	//-% Magic cost for Spectral Barrier
+	//Nature skills
+	SKILL_STRONGNATURE,		//+% Damage for Nature
+	SKILL_CHEAPNATURE,		//-% Magic cost for Nature
+	//Wind skills
+	SKILL_STRONGWIND,		//+% Damage for Wind
+	SKILL_CHEAPWIND,		//-% Magic cost for Wind
+	//Ice skills
+	SKILL_STRONGICE,		//+% Damage for Ice
+	SKILL_CHEAPICE,			//-% Magic cost for Ice
 	//Fire skills
 	SKILL_STRONGFIRE,		//+% Damage for Fire
 	SKILL_CHEAPFIRE,		//-% Magic cost for Fire
-	SKILL_FLAMEWALK,		//No knockback from Fire-based attacks
-	SKILL_BURN,				//Fire projectiles set enemies on fire for damage over time. Part of Horizon's passive and inflicted by Pyron's flame aura in Yuurand. Property of Hart's upgraded Fire Conduit in Reikon.
-	SKILL_SPARK,			//Fire projectiles spawn smaller sparks of fire which dissappear shortly afterwards.
+	//Nova skills
+	SKILL_STRONGNOVA,		//+% Damage for Nova
+	SKILL_CHEAPNOVA,		//-% Magic cost for Nova
+	//Technology skills
+	SKILL_STRONGTECH,		//+% Damage for Technology
+	SKILL_CHEAPTECH,		//-% Magic cost for Technology
+	//Astral skills
+	SKILL_STRONGASTRAL,		//+% Damage for Astral
+	SKILL_CHEAPASTRAL,		//-% Magic cost for Astral
 	SKILL_LAST
 };
 
@@ -65,22 +83,28 @@ namespace SkillTree
 	enum
 	{
 		NODE_DATA,			//Int: Combo ID of the node. This uses combo+1 if the node is purchased
-		NODE_CSET,			//Int: CSet of the node.
-		NODE_X,				//Int: X coordinate of the node
-		NODE_Y,				//Int: Y coordinate of the node
+		NODE_X,				//Int: Center X coordinate of the node
+		NODE_Y,				//Int: Center Y coordinate of the node
 		NODE_EFFECTWIDTH,	//Int: Width of the node
 		NODE_EFFECTHEIGHT,	//Int: Height of the node
-		NODE_TILEWIDTH,		//Int: Tile Width of the node graphic
-		NODE_TILEHEIGHT,	//Int: Tile Height of the node graphic
+		NODE_TILEWIDTH,		//Int: Node's tile width
+		NODE_TILEHEIGHT,	//Int: Node's tile height
 		NODE_PRICE,			//Int: The coin price of the node. D0 on its corresponding FFC.
 		NODE_MODICON,		//Int: The modifier icon on the FFC. D1 on its corresponding FFC.
-		NODE_UNLOCKS1 = 13,	//Float: Unlocks connections 1 and 5 when purchased. D4 on its corresponding FFC
-		NODE_UNLOCKS2,		//Float: Unlocks connections 2 and 6 when purchased. D5 on its corresponding FFC
-		NODE_UNLOCKS3,		//Float: Unlocks connections 3 and 7 when purchased. D6 on its corresponding FFC
-		NODE_UNLOCKS4,		//Float: Unlocks connections 4 and 8 when purchased. D7 on its corresponding FFC
+		NODE_UNLOCK1 = 13,	//Int: Unlocks connection 1 when purchased. Integer side of D4 on its corresponding FFC
+		NODE_UNLOCK1_BEND,	//Int: Position on the X axis where it bends (if it bends). Decimal side of D4 on its corresponding FFC.
+		NODE_UNLOCK2,		//Ditto, for connection 2. D5 on its corresponding FFC
+		NODE_UNLOCK2_BEND,	//"" ""
+		NODE_UNLOCK3,		//Ditto, for connection 3. D6 on its corresponding FFC
+		NODE_UNLOCK3_BEND,	//"" ""
+		NODE_UNLOCK4,		//Ditto, for connection 4. D7 on its corresponding FFC
+		NODE_UNLOCK4_BEND,	//"" ""
 		NODE_BROUGHT,		//Bool: Wherever the player has brought the node or not
+		NODE_CENTERX,		//Int: CenterX position. Used for connecting nodes.
+		NODE_CENTERY,		//Int: CenterY position. Used for connecting nodes.
 		NODE_END
 	};
+	CONFIG LINE_THICKNESS = 2; //How thick the lines are
 	void Operate(int map, int screen)
 	{
 		//Set up the skill tree screen.
@@ -93,7 +117,6 @@ namespace SkillTree
 			if(TreeScreen->NumFFCs[fcmb]) //Valid FFC
 			{
 				node[(fcmb-1)*NODE_END+NODE_DATA] = TreeScreen->FFCData[fcmb];
-				node[(fcmb-1)*NODE_END+NODE_CSET] = TreeScreen->FFCCSet[fcmb];
 				node[(fcmb-1)*NODE_END+NODE_X] = TreeScreen->FFCX[fcmb];
 				node[(fcmb-1)*NODE_END+NODE_Y] = TreeScreen->FFCY[fcmb];
 				node[(fcmb-1)*NODE_END+NODE_EFFECTWIDTH] = TreeScreen->FFCEffectWidth[fcmb];
@@ -102,10 +125,16 @@ namespace SkillTree
 				node[(fcmb-1)*NODE_END+NODE_TILEHEIGHT] = TreeScreen->FFCTileHeight[fcmb];
 				node[(fcmb-1)*NODE_END+NODE_PRICE] = TreeScreen->GetFFCInitD(fcmb, 0);
 				node[(fcmb-1)*NODE_END+NODE_MODICON] = TreeScreen->GetFFCInitD(fcmb, 1);
-				node[(fcmb-1)*NODE_END+NODE_UNLOCKS1] = TreeScreen->GetFFCInitD(fcmb, 4);
-				node[(fcmb-1)*NODE_END+NODE_UNLOCKS2] = TreeScreen->GetFFCInitD(fcmb, 5);
-				node[(fcmb-1)*NODE_END+NODE_UNLOCKS3] = TreeScreen->GetFFCInitD(fcmb, 6);
-				node[(fcmb-1)*NODE_END+NODE_UNLOCKS4] = TreeScreen->GetFFCInitD(fcmb, 7);
+				node[(fcmb-1)*NODE_END+NODE_UNLOCK1] = TreeScreen->GetFFCInitD(fcmb, 4)>>0;
+				node[(fcmb-1)*NODE_END+NODE_UNLOCK1_BEND] = DecimalToInt(TreeScreen->GetFFCInitD(fcmb, 4));
+				node[(fcmb-1)*NODE_END+NODE_UNLOCK2] = TreeScreen->GetFFCInitD(fcmb, 5)>>0;
+				node[(fcmb-1)*NODE_END+NODE_UNLOCK2_BEND] = DecimalToInt(TreeScreen->GetFFCInitD(fcmb, 5));
+				node[(fcmb-1)*NODE_END+NODE_UNLOCK3] = TreeScreen->GetFFCInitD(fcmb, 6)>>0;
+				node[(fcmb-1)*NODE_END+NODE_UNLOCK3_BEND] = DecimalToInt(TreeScreen->GetFFCInitD(fcmb, 6));
+				node[(fcmb-1)*NODE_END+NODE_UNLOCK4] = TreeScreen->GetFFCInitD(fcmb, 7)>>0;
+				node[(fcmb-1)*NODE_END+NODE_UNLOCK4_BEND] = DecimalToInt(TreeScreen->GetFFCInitD(fcmb, 7));
+				node[(fcmb-1)*NODE_END+NODE_CENTERX] = TreeScreen->FFCX[fcmb]+TreeScreen->FFCEffectWidth[fcmb]/2;
+				node[(fcmb-1)*NODE_END+NODE_CENTERY] = TreeScreen->FFCY[fcmb]+TreeScreen->FFCEffectHeight[fcmb]/2;
 			}
 		}
 		//Draw the tree.
@@ -125,54 +154,72 @@ namespace SkillTree
 		{
 			if(node[(fcmb-1)*NODE_END+NODE_DATA] > 0)
 			{
-				//Draw the combo
-				bmp->DrawCombo(1, node[GetNode(fcmb, NODE_X)], node[GetNode(fcmb, NODE_Y)], node[GetNode(fcmb, NODE_DATA)], node[GetNode(fcmb, NODE_TILEWIDTH)], node[GetNode(fcmb, NODE_TILEHEIGHT)], node[GetNode(fcmb, NODE_CSET)], -1, -1, 0, 0, 0, 0, 0, true, OP_OPAQUE);
 				//The lines are drawn behind everything else
 				for(int unlock = 0; unlock < 4; unlock ++)
 				{
 					//The code looks a bit hard to parse but its mostly functions, which are more readable than a mass of calculations strewn about.
-					int refval = node[GetNode(fcmb, NODE_UNLOCKS1+unlock)]>>0;
-					if(node[(fcmb-1)*NODE_END+NODE_UNLOCKS1+unlock]>>0 > 0) //Interger side, unlock 1 of that arg
-						bmp->Line(0, node[GetNode(fcmb,NODE_X)] + node[GetNode(fcmb,NODE_EFFECTWIDTH)]/2, node[GetNode(fcmb,NODE_Y)] + node[GetNode(fcmb,NODE_EFFECTHEIGHT)]/2, node[GetNode(refval,NODE_X)] + node[GetNode(refval,NODE_EFFECTWIDTH)]/2, node[GetNode(refval,NODE_Y)] + node[GetNode(refval,NODE_EFFECTHEIGHT)]/2, (node[GetNode(fcmb,NODE_BROUGHT)] ? C_WHITE : C_GREY), 1, 0, 0, 0, OP_OPAQUE);
-					refval = DecimalToInt(node[GetNode(fcmb, NODE_UNLOCKS1+unlock)]);
-					if(refval > 0) //Decimal side, unlock 2 of that arg
-						bmp->Line(0, node[GetNode(fcmb,NODE_X)] + node[GetNode(fcmb,NODE_EFFECTWIDTH)]/2, node[GetNode(fcmb,NODE_Y)] + node[GetNode(fcmb,NODE_EFFECTHEIGHT)]/2, node[GetNode(refval,NODE_X)] + node[GetNode(refval,NODE_EFFECTWIDTH)]/2, node[GetNode(refval,NODE_Y)] + node[GetNode(refval,NODE_EFFECTHEIGHT)]/2, (node[GetNode(fcmb,NODE_BROUGHT)] ? C_WHITE : C_GREY), 1, 0, 0, 0, OP_OPAQUE);
+					//This references the unlocks.
+					int refval = node[GetNode(fcmb, NODE_UNLOCK1+unlock*2)];
+					if(refval > 0)
+					{
+						int ydif = node[GetNode(fcmb,NODE_CENTERY)] - node[GetNode(refval,NODE_CENTERY)];
+						bool brought = node[GetNode(fcmb,NODE_BROUGHT)];
+						//Right now this code is real ugly. Might stuff this into a function call later.
+						//Draw the first line.
+						bmp->Rectangle(brought ? 0 : 1, node[GetNode(fcmb,NODE_CENTERX)], node[GetNode(fcmb,NODE_CENTERY)]-Floor(LINE_THICKNESS/2), (ydif == 0 ? node[GetNode(refval,NODE_CENTERX)] : node[GetNode(fcmb,NODE_UNLOCK1_BEND+unlock*2)])-LINE_THICKNESS, node[GetNode(fcmb,NODE_CENTERY)]+Floor(LINE_THICKNESS/2)-(LINE_THICKNESS%2==0?1:0), brought ? C_WHITE : C_GREY, 1, 0, 0, 0, true, OP_OPAQUE);
+						//The source and target combo's centers are not on the same Y axis, draw the bend.
+						if(ydif != 0)
+						{
+							//Draw the first corner bit.
+							SafeArc(bmp, brought ? 0 : 1, node[GetNode(fcmb,NODE_UNLOCK1_BEND+unlock*2)]-LINE_THICKNESS, node[GetNode(fcmb,NODE_CENTERY)]+(ydif<0 ? Floor(LINE_THICKNESS/2)-(LINE_THICKNESS%2==0?1:0) : -(Floor(LINE_THICKNESS/2))), LINE_THICKNESS-1, 0, (ydif<0?90:-90), brought ? C_WHITE : C_GREY, 1, 0, 0, 0, true, true, OP_OPAQUE);
+							//Draw the vertical line
+							bmp->Rectangle(brought ? 0 : 1, node[GetNode(fcmb,NODE_UNLOCK1_BEND+unlock*2)]-LINE_THICKNESS, node[GetNode(fcmb,NODE_CENTERY)]+(ydif<0 ? Floor(LINE_THICKNESS/2)-(LINE_THICKNESS%2==0?1:0) : -(Floor(LINE_THICKNESS/2))), node[GetNode(fcmb,NODE_UNLOCK1_BEND+unlock*2)]-1, node[GetNode(refval,NODE_CENTERY)]+(ydif<0 ? -(Floor(LINE_THICKNESS/2)) : Floor(LINE_THICKNESS/2)-(LINE_THICKNESS%2==0?1:0)), brought ? C_WHITE : C_GREY, 1, 0, 0, 0, true, OP_OPAQUE);
+							//Draw the second corner bit.
+							SafeArc(bmp, brought ? 0 : 1, node[GetNode(fcmb,NODE_UNLOCK1_BEND+unlock*2)]-1, node[GetNode(refval,NODE_CENTERY)]+(ydif<0 ? -(Floor(LINE_THICKNESS/2)) : Floor(LINE_THICKNESS/2)-(LINE_THICKNESS%2==0?1:0)), LINE_THICKNESS-1, 180, (ydif<0?270:90), brought ? C_WHITE : C_GREY, 1, 0, 0, 0, true, true, OP_OPAQUE);
+							//Draw the final horizontal line.
+							bmp->Rectangle(brought ? 0 : 1, node[GetNode(fcmb,NODE_UNLOCK1_BEND+unlock*2)], node[GetNode(refval,NODE_CENTERY)]-Floor(LINE_THICKNESS/2), node[GetNode(refval,NODE_CENTERX)], node[GetNode(refval,NODE_CENTERY)]+Floor(LINE_THICKNESS/2)-(LINE_THICKNESS%2==0?1:0), brought ? C_WHITE : C_GREY, 1, 0, 0, 0, true, OP_OPAQUE);
+						}
+						//printf("Third line of source node %i to target node %i. X1 = %i, Y1 = %i, X2 = %i, Y2 = %i.", fcmb, refval, node[GetNode(fcmb,NODE_UNLOCK1_BEND+unlock*2)]-LINE_THICKNESS, node[GetNode(fcmb,NODE_CENTERY)]+(ydif<0 ? Floor(LINE_THICKNESS/2)-(LINE_THICKNESS%2==0?1:0) : -(Floor(LINE_THICKNESS/2))), node[GetNode(fcmb,NODE_UNLOCK1_BEND+unlock*2)], node[GetNode(fcmb,NODE_CENTERY)]+(ydif<0 ? -(Floor(LINE_THICKNESS/2)) : Floor(LINE_THICKNESS/2)-(LINE_THICKNESS%2==0?1:0))); TraceNL();
+						//bmp->Line(0, node[GetNode(fcmb,NODE_X)] + node[GetNode(fcmb,NODE_EFFECTWIDTH)]/2, node[GetNode(fcmb,NODE_Y)] + node[GetNode(fcmb,NODE_EFFECTHEIGHT)]/2, node[GetNode(refval,NODE_X)] + node[GetNode(refval,NODE_EFFECTWIDTH)]/2, node[GetNode(refval,NODE_Y)] + node[GetNode(refval,NODE_EFFECTHEIGHT)]/2, node[GetNode(fcmb,NODE_BROUGHT)] ? C_WHITE : C_GREY, LINE_THICKNESS, 0, 0, 0, OP_OPAQUE);
+					}
 				}
+				//Draw the combo
+				bmp->DrawCombo(2, node[GetNode(fcmb, NODE_X)], node[GetNode(fcmb, NODE_Y)], node[GetNode(fcmb, NODE_DATA)], node[GetNode(fcmb, NODE_TILEWIDTH)], node[GetNode(fcmb, NODE_TILEHEIGHT)], 0, -1, -1, 0, 0, 0, 0, 0, true, OP_OPAQUE);
 			}
 		}
 		//Draw the box below the skill tree. Parameters are as follow:
 		//Description box
-		CONFIG DESCBOX_TILE = 42004;	//First tile used
+		CONFIG DESCBOX_TILE = 42003;	//First tile used
 		CONFIG DESCBOX_X = 33;			//X position on bitmap
 		CONFIG DESCBOX_Y = 176;			//Y position on bitmap
 		CONFIG DESCBOX_WIDTH = 223;		//Box width
 		CONFIG DESCBOX_HEIGHT = 48; 	//Box height
 		CONFIG DESCBOX_CSET = 6;		//CSet
 		//Stat box
-		CONFIG STATBOX_TILE = 42024;	//Ditto
+		CONFIG STATBOX_TILE = 42023;	//Ditto
 		CONFIG STATBOX_X = 0;			
 		CONFIG STATBOX_Y = 176;			
 		CONFIG STATBOX_WIDTH = 32;		
 		CONFIG STATBOX_HEIGHT = 48; 	
 		CONFIG STATBOX_CSET = 6;		
 		//Name box
-		CONFIG NAMEBOX_TILE = 42004;	//Also Ditto
+		CONFIG NAMEBOX_TILE = 42003;	//Also Ditto
 		CONFIG NAMEBOX_X = 33;			
 		CONFIG NAMEBOX_Y = 161;			
 		CONFIG NAMEBOX_WIDTH = 64;		
 		CONFIG NAMEBOX_HEIGHT = 14; 	
 		CONFIG NAMEBOX_CSET = 6;				
 		//Coin box
-		CONFIG COINBOX_TILE = 42004;	//Also Ditto
+		CONFIG COINBOX_TILE = 42003;	//Also Ditto
 		CONFIG COINBOX_X = 98;			
 		CONFIG COINBOX_Y = 161;			
 		CONFIG COINBOX_WIDTH = 24;		
 		CONFIG COINBOX_HEIGHT = 14; 	
 		CONFIG COINBOX_CSET = 6;	
-		DrawBoxScale(0, bmp, {DESCBOX_TILE, 3, 3, DESCBOX_TILE+1, 1, 3, DESCBOX_TILE+2, 3, 1}, 6, C_BLACK, DESCBOX_X, DESCBOX_Y, DESCBOX_WIDTH, DESCBOX_HEIGHT, {OP_OPAQUE, OP_OPAQUE});
-		DrawBoxScale(0, bmp, {STATBOX_TILE, 3, 3, STATBOX_TILE+1, 1, 3, STATBOX_TILE+2, 3, 1}, 6, C_BLACK, STATBOX_X, STATBOX_Y, STATBOX_WIDTH, STATBOX_HEIGHT, {OP_OPAQUE, OP_OPAQUE});
-		DrawBoxScale(0, bmp, {NAMEBOX_TILE, 3, 3, NAMEBOX_TILE+1, 1, 3, NAMEBOX_TILE+2, 3, 1}, 6, C_BLACK, NAMEBOX_X, NAMEBOX_Y, NAMEBOX_WIDTH, NAMEBOX_HEIGHT, {OP_OPAQUE, OP_OPAQUE});
-		DrawBoxScale(0, bmp, {COINBOX_TILE, 3, 3, COINBOX_TILE+1, 1, 3, COINBOX_TILE+2, 3, 1}, 6, C_BLACK, COINBOX_X, COINBOX_Y, COINBOX_WIDTH, COINBOX_HEIGHT, {OP_OPAQUE, OP_OPAQUE});
+		DrawBoxScale(0, bmp, {DESCBOX_TILE, 3, 3}, 6, C_BLACK, DESCBOX_X, DESCBOX_Y, DESCBOX_WIDTH, DESCBOX_HEIGHT, {OP_OPAQUE, OP_OPAQUE});
+		DrawBoxScale(0, bmp, {STATBOX_TILE, 3, 3}, 6, C_BLACK, STATBOX_X, STATBOX_Y, STATBOX_WIDTH, STATBOX_HEIGHT, {OP_OPAQUE, OP_OPAQUE});
+		DrawBoxScale(0, bmp, {NAMEBOX_TILE, 3, 3}, 6, C_BLACK, NAMEBOX_X, NAMEBOX_Y, NAMEBOX_WIDTH, NAMEBOX_HEIGHT, {OP_OPAQUE, OP_OPAQUE});
+		DrawBoxScale(0, bmp, {COINBOX_TILE, 3, 3}, 6, C_BLACK, COINBOX_X, COINBOX_Y, COINBOX_WIDTH, COINBOX_HEIGHT, {OP_OPAQUE, OP_OPAQUE});
 		//bmp->DrawTile(0, DESCBOX_X,  DESCBOX_Y, DESCBOX_TILE, DESCBOX_WIDTH, DESCBOX_HEIGHT, DESCBOX_CSET, -1, -1, 0, 0, 0, 0, true, OP_OPAQUE);
 		//Screen->SetRenderTarget(RT_SCREEN);
 	}
@@ -206,6 +253,9 @@ Skill ideas that are currently not being added yet
 	SKILL_ADRENALINE,		//Speed +xxx% for 1 sec after taking damage. Writes to the speed stat during this time.
 	SKILL_LIVELY,			//Gradual life regen. One of Mirr's upgrades in Reikon
 	SKILL_RESILIENT,		//Immunity to knockback. Will be moved to Earth if it exists here. Part of Rhone's signature and Sylvia's Earth passive as well as a property of Earth Buff in Yuurand. One of Holm's upgrades in Reikon.
+	SKILL_FLAMEWALK,		//No knockback from Fire-based attacks
+	SKILL_BURN,				//Fire projectiles set enemies on fire for damage over time. Part of Horizon's passive and inflicted by Pyron's flame aura in Yuurand. Property of Hart's upgraded Fire Conduit in Reikon.
+	SKILL_SPARK,			//Fire projectiles spawn smaller sparks of fire which dissappear shortly afterwards.
 	//Water skills
 	SKILL_STRONGWATER,		//+% Damage for Water
 	SKILL_80MPWATER,		//Water consumes 4/5 MP

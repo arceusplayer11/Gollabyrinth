@@ -1,4 +1,9 @@
-//This may or may not get rewritten depending on where we're going with the spell system.
+/*
+Nova Spell, written by Orithan.
+Plasma Element, Burn Damage
+Charge up a ball of superheated Plasma energy and then fire it.
+This may or may not get rewritten depending on where we're going with the spell system.
+*/
 
 //Sets up the Nova spell.
 itemdata script NovaItem
@@ -20,13 +25,24 @@ itemdata script NovaItem
 	}
 }
 
-const int SFX_NOVA = 61;	//The first sound in a set of five sounds that Nova uses. Right now it uses the Sound Wave charging sounds.
-const int SPR_NOVA = 88;	//The first sprite in a set of four sprites that Nova uses. They should go in the following order: Charging sprite, Vertical facing sprite, Horizontal facing sprite, explosion sprite. The charging sprite goes progressively faster the longer the charge is held.
+CONFIG SFX_NOVA = 61;	//The first sound in a set of five sounds that Nova uses. Right now it uses the Sound Wave charging sounds.
+CONFIG SPR_NOVA = 88;	//The first sprite in a set of four sprites that Nova uses. They should go in the following order: Charging sprite, Shot sprites, explosion sprite, sparkle sprite. The charging sprite goes progressively faster the longer the charge is held.
 
 lweapon script Nova
 {
 	void run(int itemid)
 	{
+		//The following should be set in the item's metadata if we go the item route. I much prefer to do it on the item route.
+		CONFIG NOVA_DAMAGE = 10;	//Nova's base damage. Placeholder
+		CONFIG NOVA_COST = 64;		//Nova's base cost. Placeholder
+		CONFIG NOVA_STEP = 250;		//Nova's base step speed.
+		CONFIG NOVA_CHARGE_TIME = 120;	//Amount of time Nova takes to charge
+		CONFIG NOVA_SFX_FREQ = 18;		//Amount of time between SFX played
+		CONFIG NOVA_BLAST_TIME = 90;	//Amount of time Nova's explosion persists. It expands to full size in half the time
+		CONFIG NOVA_BLAST_DRAW = 96;	//The blast is drawn this size
+		//The following would not be part of the item's metadata
+		CONFIG NOVA_BLAST_WIDTH = NOVA_BLAST_DRAW; //Width of the blast
+		CONFIG NOVA_BLAST_HEIGHT = NOVA_BLAST_WIDTH*0.75; //Height of the blast. This is set based off the placeholder Rose Ultima/Meteor explosion sprites.
 		this->HitXOffset = -1000;
 		this->DrawXOffset = -1000;
 		this->CollDetection = false;
@@ -35,32 +51,32 @@ lweapon script Nova
 		lweapon Nova = Screen->CreateLWeapon(LW_SCRIPT2); //Spawn the charging graphic
 		Nova->CollDetection = false;
 		Nova->UseSprite(SPR_NOVA);
+		Nova->Damage = Character::GetAttackDamage(NOVA_DAMAGE, ELEMENT_PLASMA);
 		//Hide the Nova's actual sprite
 		Nova->DrawXOffset = -1000;
 		int timer = 0;
 		//Nova charge.
-		while (IsUsingItem(itemid) && Nova->isValid())
+		while (IsUsingItem(itemid) && Nova->isValid() && Hero->MP >= NOVA_COST)
 		{
 			//Position the charging shot in front of the player
-			Nova->X = Hero->X+InFrontX(Hero->Dir, 8);
-			Nova->Y = Hero->Y+InFrontY(Hero->Dir, 8);
-			Nova->Damage = 10;
+			Nova->X = Hero->X+InFrontX(Hero->Dir, 10);
+			Nova->Y = Hero->Y+InFrontY(Hero->Dir, 10);
 			//Increase the size and intensity of the charge orb
-			if(timer > 0 && timer <= 120 && timer%60 == 0)
+			if(timer > 0 && timer <= NOVA_CHARGE_TIME && timer%(NOVA_CHARGE_TIME/2) == 0)
 			{
 				Nova->OriginalTile += 2;
 				Nova->ASpeed -= 4;
 			}
 			//Cycle through the charge sounds.
-			if(timer >= 66 && (timer-66)%18 == 0)
-				Audio->PlaySound(SFX_NOVA+(Min(Div(timer-66, 18), 3))); //Cap it at the fourth charge sound
+			if(timer >= NOVA_CHARGE_TIME-(NOVA_SFX_FREQ*3) && (timer-(NOVA_CHARGE_TIME-(NOVA_SFX_FREQ*3)))%NOVA_SFX_FREQ == 0)
+				Audio->PlaySound(SFX_NOVA+Min(Div(timer-(NOVA_CHARGE_TIME-(NOVA_SFX_FREQ*3)), NOVA_SFX_FREQ), 3)); //Cap it at the fourth charge sound
 			//Draw the tile as overlapping or underlapping
 			DrawLayerFix::FastTile(Hero->Dir == DIR_UP ? 2 : 3, Nova->X, Nova->Y-2, Nova->Tile, Nova->CSet, OP_OPAQUE); //Superimpose the tile over the player.
 			timer ++;
 			Waitframe();
 		}
-		//Insufficient time charged or the Nova weapon is removed prematurely, remove the charge shot and cancel the script.
-		if(timer < 120 || !Nova->isValid())
+		//Insufficient time charged, insufficient Magic or the Nova weapon is removed prematurely, remove the charge shot and cancel the script.
+		if(timer < NOVA_CHARGE_TIME || !Nova->isValid() || Hero->MP < NOVA_COST)
 		{
 			if(Nova->isValid())
 				Remove(Nova);
@@ -68,11 +84,12 @@ lweapon script Nova
 		}
 		//The shot now fires
 		//Shot graphic setting
+		Hero->MP -= NOVA_COST;
 		Nova->UseSprite(SPR_NOVA+1);
 		Nova->OriginalTile += Hero->Dir*2;
 		Nova->CollDetection = true;
 		Nova->Dir = Hero->Dir;
-		Nova->Step = 250;
+		Nova->Step = NOVA_STEP;
 		Nova->DrawXOffset = 0; //Reset draw offset
 		Audio->PlaySound(SFX_NOVA+4); //Shot sound
 		bool collide = false;
@@ -97,20 +114,17 @@ lweapon script Nova
 		timer = 0;
 		spritedata explosion = Game->LoadSpriteData(SPR_NOVA+2);
 		//Explody fun times ahead. Hope you packed some popcorn!
-		CONFIG BLAST_DRAW = 96;	//The blast is drawn this size
-		CONFIG BLAST_WIDTH = BLAST_DRAW; //Width of the blast
-		CONFIG BLAST_HEIGHT = BLAST_WIDTH*0.75; //Height of the blast. This is set based off the placeholder Rose Ultima/Meteor explosion sprites.
-		while (Nova->isValid() && isOnScreen(Nova->X, Nova->Y) && timer < 90)
+		while (Nova->isValid() && isOnScreen(Nova->X, Nova->Y) && timer < NOVA_BLAST_TIME)
 		{
 			//Set and expand the weapon's hitbox to match the explosion
-			Nova->HitWidth = Round(BLAST_WIDTH/48*Min(timer, 48));
-			Nova->HitXOffset = 8-Round((BLAST_WIDTH/2)/48*Min(timer, 48));
-			Nova->HitHeight = Round(BLAST_HEIGHT/48*Min(timer, 48));
-			Nova->HitYOffset = 8-Round((BLAST_HEIGHT/2)/48*Min(timer, 48));
+			Nova->HitWidth = Round(NOVA_BLAST_WIDTH/48*Min(timer, 48));
+			Nova->HitXOffset = 8-Round((NOVA_BLAST_WIDTH/2)/48*Min(timer, 48));
+			Nova->HitHeight = Round(NOVA_BLAST_HEIGHT/48*Min(timer, 48));
+			Nova->HitYOffset = 8-Round((NOVA_BLAST_HEIGHT/2)/48*Min(timer, 48));
 			//Screen->Rectangle(int layer, int x, int y, int x2, int y2, int color, float scale, int rx, int ry, int rangle, false, OP_OPAQUE);	//DEBUG draw.
 			
 			//Placeholder Rose Ultima/Meteor explosion for now. Will need to get better explody sprites later.
-			DrawLayerFix::DrawTile(2, Nova->X+8-(BLAST_DRAW/2)/48*Min(timer, 48), Nova->Y+8-(BLAST_DRAW/2)/48*Min(timer, 48), explosion->Tile, 4, 4, explosion->CSet, BLAST_DRAW/48*Min(timer, 48), BLAST_DRAW/48*Min(timer, 48), 0, 0, 0, 0, true, OP_TRANS);
+			DrawLayerFix::DrawTile(2, Nova->X+8-(NOVA_BLAST_DRAW/2)/48*Min(timer, 48), Nova->Y+8-(NOVA_BLAST_DRAW/2)/48*Min(timer, 48), explosion->Tile, 4, 4, explosion->CSet, NOVA_BLAST_DRAW/48*Min(timer, 48), NOVA_BLAST_DRAW/48*Min(timer, 48), 0, 0, 0, 0, true, OP_TRANS);
 			if(timer%15 == 0)
 			{
 				Audio->PlaySound(SFX_RUMBLE);

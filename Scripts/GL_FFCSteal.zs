@@ -1,3 +1,5 @@
+//Written by Dimi
+//Copies the data from another screen's FFC. ~ Orithan
 ffc script GetOtherScreenFFCData
 {
 	void run(int map, int screen, int ffcnum)

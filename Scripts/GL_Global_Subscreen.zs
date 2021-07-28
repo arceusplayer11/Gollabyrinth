@@ -59,7 +59,10 @@ dmapdata script ActiveSubscreen
 			//Open Skill Tree
 			if(Input->Press[CB_SKILLTREE])
 			{
-				SkillTree::Operate(1, 0x71);
+				using namespace Character;
+				untyped chardata = ReturnCharacterArray(G[G_CHARID]); //Fetch the character's array pointer.
+				if(chardata > -1) //Pointer is valid
+					SkillTree::Operate(1, <int>chardata[CHARACTER_UPGRADESCREEN]);
 			}
 			
 			//Process cursor movement inputs.

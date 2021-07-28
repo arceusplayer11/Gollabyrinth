@@ -1,6 +1,14 @@
 # GOLLABYRINTH - CHANGES MADE BY ORITHAN
 
-### Commit #4. ZC Version: 2.55 Alpha 85+. July ? 2021.
+### Commit #5. ZC Version: 2.55 Alpha 85+. July 29th 2021.
+
+- Skill tree draws are now operational. They only work with Luanja so far.
+- Added Bitmap versions of Dimi's Safe Arc functions.
+- Optimized the `DrawBoxScale()` function. Now it only requires the three corner args for its tile metadata, but it also asks you to set your horizontal and vertical box border tiles to the tiles right after it.
+- Added a list of element definitions to the main file in preparation for a mechanic I am planning on setting up.
+- Tweaked Nova, added a proper Magic cost to it and added CONFIGs for it.
+
+### Commit #4. ZC Version: 2.55 Alpha 85+. July 27th 2021.
 
 - Added `DrawLayerFix.zh` and put it into a dedicated header folder. This version is wrapped in the `DrawLayerFix` namespace in the unlikely event we end up getting other functions with the same identifier.
 - The Plasma Spell, Nova, has been implemented. The SFX and explosion sprites are currently placeholder. I need to secure a source of either Metroid Prime 1's Plasma Beam charge and charge shot SFX or Metroid Prime 3's Nova Beam charge and charge shot SFX or something that feels similar to those. I also need a more "solar" explosion animation.

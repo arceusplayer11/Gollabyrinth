@@ -164,6 +164,9 @@ dmapdata script PassiveSubscreen
 			Screen->FastTile(7, 106, -24, 39001+G[G_BUTTON_B], 0, OP_OPAQUE);
 			Screen->FastTile(7, 106, -49, 39001+G[G_BUTTON_L], 0, OP_OPAQUE);
 			Screen->FastTile(7, 131, -49, 39001+G[G_BUTTON_R], 0, OP_OPAQUE);
+			//Same logic applies to the coin counter.
+			Screen->Rectangle(7, 164, 33+SUBSCREEN_TOP, 174, 38+SUBSCREEN_TOP, C_BLACK, 1, 0, 0, 0, true, OP_OPAQUE);
+			Screen->DrawInteger(7, 164, 33+SUBSCREEN_TOP, FONT_Z3SMALL, C_WHITE, -1, -1, -1, Game->Counter[CR_COINS], 0, OP_OPAQUE); //Coin counter
 			Waitframe();
 		}
 	}

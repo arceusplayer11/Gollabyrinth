@@ -1,17 +1,28 @@
 //Force compiler options
 #option TRUNCATE_DIVISION_BY_LITERAL_BUG off
 #option BOOL_TRUE_RETURN_DECIMAL off
+#option SHORT_CIRCUIT on
+#option TRUE_INT_SIZE on
 
+//Headers
 #include "std.zh"
-#include "Classic.zh"
+#include "ffcscript.zh"
+
+//Fonts
+#include "Gollabyrinth/Headers/tango/font/tango_LttPSmall.zh"
 
 //Customized Headers
+#include "Gollabyrinth/Headers/stdExtra.zh"
+#include "Gollabyrinth/Headers/ghost.zh"
+#include "Gollabyrinth/Headers/tango.zh"
+
 #include "Gollabyrinth/Headers/DrawLayerFix.zh"
 
 //Utilities
 #include "Gollabyrinth/Scripts/GL_Gen_Scripts.zs"
 #include "Gollabyrinth/Scripts/GL_Gen_Functions.zs"
 #include "Gollabyrinth/Scripts/GL_Gen_TestingScripts.zs"
+#include "Gollabyrinth/Scripts/GL_Gen_TangoStyles.zs"
 
 //Global scale stuff
 #include "Gollabyrinth/Scripts/GL_Global_Subscreen.zs"
@@ -42,10 +53,10 @@ typedef const float CONFIGF;	//Float configs
 typedef const bool CONFIGB;		//Boolean configs
 
 
-CONFIGF BASESTAT_ATTACK = 1.0;	//Your base Attack stat. This refers to the amount of damage you do with your basic primary
-CONFIGF BASESTAT_DEFENSE = 1.0;	//Your base Defense stat. This does not correlate 1:1 to what is shown in the editor, as higher numbers indicate more defense and lower values less defense as opposed to what it would be on the 
-CONFIGF BASESTAT_SPEED = 1.5;	//The base step speed.
-CONFIGF BASESTAT_MAGIC = 1.0; 	//The base magic regen stat.
+CONFIG BASESTAT_ATTACK = 100;	//Your base Attack stat. This refers to the amount of damage you do with your basic primary
+CONFIG BASESTAT_DEFENSE = 100;	//Your base Defense stat. This does not correlate 1:1 to what is shown in the editor, as higher numbers indicate more defense and lower values less defense as opposed to what it would be on the 
+CONFIG BASESTAT_SPEED = 100;	//The base step speed.
+CONFIG BASESTAT_MAGIC = 100; 	//The base magic regen stat.
 
 enum		//Enums are actually fantastic for global arrays.
 {
@@ -65,6 +76,7 @@ G_ATTACK,				//Float: Current Attack stat. 1 = Standard Damage
 G_DEFENSE,				//Float: Current Defense stat. 1 = Standard Defense
 G_SPEED,				//Float: Current Speed stat. This modifies Hero->Step directly. 1 = 100 Step Speed. 
 G_MAGIC,				//Float: Current Magic stat. This modifies how quickly magic regens.
+G_LASTNODE,				//Int: The last node the player had highlighted.
 G_MENUARRAY = 1024,		//Int: Beginning of the menu array vars
 G_MENUARRAYEND = 2048,	//Int: End of the menu array vars
 G_END};
@@ -76,10 +88,10 @@ C_GRAY =  0x0D,
 C_GREY =  C_GRAY, //Extra constant because there are two different spellings of "Grey"
 C_WHITE = 0x0E,
 C_BLACK = 0x0F,
-C_HOLY =  0xD1,
 C_GREEN1 =  0x7A,
 C_GREEN2 =  0x7B,
-C_GREEN3 =  0x7C
+C_GREEN3 =  0x7C,
+C_HOLY =  0xD1
 };
 
 //List of elements.
@@ -88,8 +100,8 @@ enum Element
 {
 	ELEMENT_NON_START, //Start of Non-Elemental damage type
 	ELEMENT_NEUTRAL = ELEMENT_NON_START,
-	ELEMENT_ARCANE,
-	ELEMENT_NON_END = ELEMENT_ARCANE, //End of Non-Elemental damage type
+	ELEMENT_SPECTRAL,
+	ELEMENT_NON_END = ELEMENT_SPECTRAL, //End of Non-Elemental damage type
 	
 	ELEMENT_NATURAL_START, //Start of Natural damage type
 	ELEMENT_NATURE = ELEMENT_NATURAL_START,
@@ -104,8 +116,8 @@ enum Element
 	
 	ELEMENT_BURN_START, //Start of Burn damage type
 	ELEMENT_FIRE = ELEMENT_BURN_START,
-	ELEMENT_PLASMA,
-	ELEMENT_BURN_END = ELEMENT_PLASMA, //End of Burn damage type
+	ELEMENT_NOVA,
+	ELEMENT_BURN_END = ELEMENT_NOVA, //End of Burn damage type
 	
 	ELEMENT_TECH_START, //Start of Technology damage type
 	ELEMENT_TECHNOLOGY = ELEMENT_TECH_START,
@@ -127,6 +139,32 @@ enum Element
 	ELEMENT_END //Cap enum
 };
 
+//Tile references
+CONFIG TILE_STAT_ATTACK = 41856;
+CONFIG TILE_STAT_DEFENSE = TILE_STAT_ATTACK+1;
+CONFIG TILE_STAT_SPEED = TILE_STAT_ATTACK+2;
+CONFIG TILE_STAT_MAGIC = TILE_STAT_ATTACK+3;
+
+//Upgrade extra icons
+CONFIG TILE_UPGRADE = 41843; //The first upgrade icon
+CONFIG TILE_UPGRADE_DAMAGE = TILE_UPGRADE; //Damage
+CONFIG TILE_UPGRADE_DEFENSE = TILE_UPGRADE+1; //Defense
+CONFIG TILE_UPGRADE_SPEED = TILE_UPGRADE+2; //Speed
+CONFIG TILE_UPGRADE_MAGIC = TILE_UPGRADE+3; //Magic
+CONFIG TILE_UPGRADE_PLUS = TILE_UPGRADE+4; //Plus (eg. Enhance-style upgrade)
+CONFIG TILE_UPGRADE_EXTEND = TILE_UPGRADE+5; //Extended (eg. Longer buffs)
+CONFIG TILE_UPGRADE_NOCD = TILE_UPGRADE+6; //No Cooldown
+CONFIG TILE_UPGRADE_INFINITE = TILE_UPGRADE+7; //Infinite (eg. No cost)
+
+//Player tiles
+CONFIG TILE_HERO = 3380; //The first tile used for player sprites on the tilesheet
+CONFIG TILE_HERO_WALK = TILE_HERO; //First up facing walk tile. Access other up facing framesadding 1 or 2 and other directions by adding Hero->Dir*3
+CONFIG TILE_HERO_ATTACK = TILE_HERO+12; //Up facing attack sprites. To access other directions add Hero->Dir.
+CONFIG TILE_HERO_SWIM = TILE_HERO+20; //First up facing swimming sprites. Access other up facing tiles by adding 1 or 2 and other directions by adding Hero->Dir*3
+CONFIG TILE_HERO_DIVE = TILE_HERO+32; //Dive sprites. To access other frames add 1 or 2.
+CONFIG TILE_HERO_HOLD_WATER = TILE_HERO+35; //Two handed water hold up sprites. To get the one handed water hold up sprites add 1.
+CONFIG TILE_HERO_HOLD_LAND = TILE_HERO+37; //Two handed land hold up sprites. To get the one handed land hold up sprites add 1.
+
 //New counter definitions
 CONFIG CR_COINS = CR_CUSTOM1;	//Coin counter
 
@@ -136,6 +174,7 @@ CONFIG I_RINGPALETTE0 = 159;	//A second Ring Palette item, lower level than the 
 CONFIG I_COIN = 160;			//The basic Coin item.
 
 CONFIG SFX_RUMBLE = 76; //Rumble SFX used for Quake, Thunder, Meteor, etc. in Yuurand.
+CONFIG SFX_ERROR = 77; //Error buzzer.
 
 //LWeapon Scripts. These are hardcoded script IDs because of the way the subscreen is set up. This is subject to change in due time.
 DEFINE ITMS_PURGE = 1; //Purge
@@ -168,6 +207,13 @@ global script Global
 {
 	void run()
 	{
+		//Start Tango & Ghost
+		Tango_Start();
+		//Resets extra vars
+		Tango_ResetEXVars();
+		StartGhostZH();
+		//Initialize Tango styles
+		SetUpItmSelStyle();
 		//Initialize Character arrays.
 		Character::LuanjaInit();
 		Character::HelenaInit();
@@ -176,12 +222,16 @@ global script Global
 		//Game->DisableActiveSubscreen = true;
 		while(true)
 		{
+			Tango_Update1();
+			UpdateGhostZH1();
 			++G[G_ANIM];
 			G[G_ANIM]%=5040;
 			MagicRegen();
 			ABLR_Handle();
 			Waitdraw();
 			MPCooldownTimer();
+			Tango_Update2();
+			UpdateGhostZH2();
 			Waitframe();
 		}
 	}

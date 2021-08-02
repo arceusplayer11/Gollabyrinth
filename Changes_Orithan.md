@@ -1,5 +1,16 @@
 # GOLLABYRINTH - CHANGES MADE BY ORITHAN
 
+### Commit #6. ZC Version: 2.55 Alpha 85+. August 2nd 2021.
+
+- The `Strong [Element]` and `Cheap [Element]` upgrades are now functional. On the same token `G[G_ATTACK]` is also now functional when the appropriate functions are called to calculate damage.
+- The Skill Tree system is now fully functional, though it still has a few bells and whistles to sort out. Edited the Passive Subscreen script so it updates the coin counter correctly when the subscreen is active.
+	- Not all of the upgrade text is in yet and there are a couple of issues to sort out but it is still overall functional.
+- Added `TILE_HERO_*` CONFIGs to the main file for use when referencing player sprites in the tilesheet.
+- Drafted up Helena's skill tree.
+- Replaced the `Classic.zh` import with `ffcscript.zh`
+- `StdExtra.zh` `ghost.zh` and `tango.zh` are all added and set up.
+	- Also added a separate file for the Gollabyrinth styles 164 33
+
 ### Commit #5. ZC Version: 2.55 Alpha 85+. July 29th 2021.
 
 - Skill tree draws are now operational. They only work with Luanja so far.

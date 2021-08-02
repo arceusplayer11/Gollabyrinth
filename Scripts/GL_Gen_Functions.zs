@@ -125,6 +125,29 @@ bool isTargetable(npc enemy) //Checks if an enemy is beatable
 	return (((enemy->MiscFlags&NPCMF_NOT_BEATABLE) || enemy->Type == NPCT_FAIRY || enemy->Type == NPCT_GUY) ? false : true);
 }
 
+//Written by Orithan
+//Checks for player movement inputs on the X axis
+int InputStickX()
+{
+	int stick = 0;
+	if(Input->Press[CB_LEFT] || Input->Button[CB_LEFT] || Input->Hold[CB_LEFT] || Input->Joypad[CB_LEFT])
+		--stick;
+	if(Input->Press[CB_RIGHT] || Input->Button[CB_RIGHT] || Input->Hold[CB_RIGHT] || Input->Joypad[CB_RIGHT])
+		++stick;
+	return stick;
+}
+//Same but for the Y axis
+int InputStickY()
+{
+	int stick = 0;
+	if(Input->Press[CB_UP] || Input->Button[CB_UP] || Input->Hold[CB_UP] || Input->Joypad[CB_UP])
+		--stick;
+	if(Input->Press[CB_DOWN] || Input->Button[CB_DOWN] || Input->Hold[CB_DOWN] || Input->Joypad[CB_DOWN])
+		++stick;
+	return stick;
+}
+
+
 //Checks if the coordinates are onscreen
 bool isOnScreen(int x, int y)
 {
@@ -235,4 +258,17 @@ void SafeArc2(bitmap bmp, int layer, int x, int y, int radius, int startangle, i
 	int fy=cy+(Sin(-(endangle+startangle)/2)*radius/2);
 	if (fx >= 0 && fy >= 0 && fx < bmp->Width && fy < bmp->Height && (Abs(startangle-endangle) > 2 || radius >20)) bmp->Arc(layer, x, y, radius, startangle, endangle, color, scale, rx, ry, rangle, closed, fill, opacity);
 	else bmp->Arc(layer, x, y, radius, startangle, endangle, color, scale, rx, ry, rangle, closed, false, opacity);
+}
+
+//Written by Orithan
+//Clears the selected bitmap.
+void ClearBitmap(bitmap bit)
+{
+	ClearBitmapArea(bit, 0, 0, 511, 511);
+}
+
+//Clears an area of a bitmap
+void ClearBitmapArea(bitmap bit, int x, int y, int w, int h)
+{
+	bit->Rectangle(0, x, x, x+w, y+h, 0, 1, 0, 0, 0, true, OP_OPAQUE);
 }

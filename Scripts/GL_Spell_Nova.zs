@@ -43,6 +43,7 @@ lweapon script Nova
 		//The following would not be part of the item's metadata
 		CONFIG NOVA_BLAST_WIDTH = NOVA_BLAST_DRAW; //Width of the blast
 		CONFIG NOVA_BLAST_HEIGHT = NOVA_BLAST_WIDTH*0.75; //Height of the blast. This is set based off the placeholder Rose Ultima/Meteor explosion sprites.
+		int cost = Character::GetMagicCost(NOVA_COST, ELEMENT_NOVA); //Calculate total cost
 		this->HitXOffset = -1000;
 		this->DrawXOffset = -1000;
 		this->CollDetection = false;
@@ -51,12 +52,12 @@ lweapon script Nova
 		lweapon Nova = Screen->CreateLWeapon(LW_SCRIPT2); //Spawn the charging graphic
 		Nova->CollDetection = false;
 		Nova->UseSprite(SPR_NOVA);
-		Nova->Damage = Character::GetAttackDamage(NOVA_DAMAGE, ELEMENT_PLASMA);
+		Nova->Damage = Character::GetAttackDamage(NOVA_DAMAGE, ELEMENT_NOVA);
 		//Hide the Nova's actual sprite
 		Nova->DrawXOffset = -1000;
 		int timer = 0;
 		//Nova charge.
-		while (IsUsingItem(itemid) && Nova->isValid() && Hero->MP >= NOVA_COST)
+		while (IsUsingItem(itemid) && Nova->isValid() && Hero->MP >= cost)
 		{
 			//Position the charging shot in front of the player
 			Nova->X = Hero->X+InFrontX(Hero->Dir, 10);
@@ -76,7 +77,7 @@ lweapon script Nova
 			Waitframe();
 		}
 		//Insufficient time charged, insufficient Magic or the Nova weapon is removed prematurely, remove the charge shot and cancel the script.
-		if(timer < NOVA_CHARGE_TIME || !Nova->isValid() || Hero->MP < NOVA_COST)
+		if(timer < NOVA_CHARGE_TIME || !Nova->isValid() || Hero->MP < cost)
 		{
 			if(Nova->isValid())
 				Remove(Nova);
@@ -84,7 +85,7 @@ lweapon script Nova
 		}
 		//The shot now fires
 		//Shot graphic setting
-		Hero->MP -= NOVA_COST;
+		Hero->MP -= cost;
 		Nova->UseSprite(SPR_NOVA+1);
 		Nova->OriginalTile += Hero->Dir*2;
 		Nova->CollDetection = true;
